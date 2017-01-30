@@ -34,7 +34,7 @@
 
 #include "usbd_cdc_core.h"
 
-#include "tm_stm32f4_usb_vcp.h"
+#include "../tm_stm32f4_usb_vcp.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

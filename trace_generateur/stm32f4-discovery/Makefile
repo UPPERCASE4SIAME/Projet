@@ -1,6 +1,6 @@
 # put your *.o targets here, make should handle the rest!
 
-SRCS = main.c system_stm32f4xx.c
+SRCS = main.c system_stm32f4xx.c tm_stm32f4_disco.c tm_stm32f4_gpio.c tm_stm32f4_usb_vcp.c usb_cdc_device/usbd_cdc_core.c usb_cdc_device/usbd_cdc_vcp.c usb_cdc_device/usbd_core.c usb_cdc_device/usbd_desc.c usb_cdc_device/usbd_ioreq.c usb_cdc_device/usbd_req.c usb_cdc_device/usbd_usr.c usb_cdc_device/usb_bsp.c usb_cdc_device/usb_core.c usb_cdc_device/usb_dcd.c usb_cdc_device/usb_dcd_int.c 
 
 # all the files will be generated with this name (main.elf, main.bin, main.hex, etc)
 
@@ -45,7 +45,7 @@ lib:
 proj: 	$(PROJ_NAME).elf
 
 $(PROJ_NAME).elf: $(SRCS)
-	$(CC) $(CFLAGS) $^ -o $@ -Llib -lstm32f4
+	$(CC) $(CFLAGS) $^ -o $@ -Llib -lstm32f4 
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
 

@@ -29,7 +29,7 @@
 #include "usbd_usr.h"
 #include "usbd_ioreq.h"
 
-#include "tm_stm32f4_usb_vcp.h"
+#include "../tm_stm32f4_usb_vcp.h"
 
 #include <stdio.h>
 

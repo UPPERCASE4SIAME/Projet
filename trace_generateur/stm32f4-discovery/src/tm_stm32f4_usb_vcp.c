@@ -17,7 +17,7 @@
  * |----------------------------------------------------------------------
  */
 #include "tm_stm32f4_usb_vcp.h"
-#include "usbd_usr.h"
+#include "usb_cdc_device/usbd_usr.h"
 
 /* Private */
 uint8_t TM_INT_USB_VCP_ReceiveBuffer[USB_VCP_RECEIVE_BUFFER_LENGTH];

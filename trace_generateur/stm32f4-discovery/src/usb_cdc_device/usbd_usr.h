@@ -31,7 +31,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_core.h"
-#include "tm_stm32f4_usb_vcp.h"
+#include "../tm_stm32f4_usb_vcp.h"
 
 
 /** @addtogroup USBD_USER

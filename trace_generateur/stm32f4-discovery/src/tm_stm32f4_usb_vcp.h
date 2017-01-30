@@ -131,10 +131,10 @@ Data -		PB14
 #include "misc.h"
 #include "defines.h"
 /* Parts of USB device */
-#include "usbd_cdc_core.h"
-#include "usb_conf.h"
-#include "usbd_desc.h"
-#include "usbd_cdc_vcp.h"
+#include "usb_cdc_device/usbd_cdc_core.h"
+#include "usb_cdc_device/usb_conf.h"
+#include "usb_cdc_device/usbd_desc.h"
+#include "usb_cdc_device/usbd_cdc_vcp.h"
 
 /**
  * @defgroup TM_USB_VCP_Macros
