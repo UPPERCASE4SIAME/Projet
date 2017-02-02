@@ -22,10 +22,12 @@
 #include "tm_stm32f4_disco.h"
 #include "defines.h"
  
-void Configure_PD0(void);
+void Configure_interrupt_rotary2(void);
 void EXTI0_IRQHandler(void);
-void Configure_PB12(void);
+void Configure_interrupt_ignition(void);
 void EXTI15_10_IRQHandler(void);
+
+uint32_t TIME_IGNITION[6];
 
 /*  Le baudrate de l'UART se change dans le fichier 
  *  lib/src/peripherals/stm32f4xx_usart.c
@@ -45,7 +47,7 @@ int main(void) {
     SystemInit();
     
     /* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
-    TM_DISCO_LedInit();
+    //TM_DISCO_LedInit();
    
     /* Initiallize Counter */
     InitializeTimer();
@@ -54,8 +56,8 @@ int main(void) {
     TM_USB_VCP_Init();
 
     /* Configure PD0 as interrupt */
-    Configure_PD0();
-    Configure_PB12();
+    Configure_interrupt_rotary2();
+    Configure_interrupt_ignition();
     
     while (1) {
 /*
@@ -131,7 +133,7 @@ void InitializeTimer()
 }
 
 /* Configure pins to be interrupts */
-void Configure_PD0(void) {
+void Configure_interrupt_rotary2(void) {
     /* Set variables used */
     GPIO_InitTypeDef GPIO_InitStruct;
     EXTI_InitTypeDef EXTI_InitStruct;
@@ -162,7 +164,7 @@ void Configure_PD0(void) {
     /* Interrupt mode */
     EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
     /* Triggers on rising and falling edge */
-    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
     /* Add to EXTI */
     EXTI_Init(&EXTI_InitStruct);
  
@@ -179,7 +181,7 @@ void Configure_PD0(void) {
     NVIC_Init(&NVIC_InitStruct);
 } 
 
-void Configure_PB12(void) {
+void Configure_interrupt_ignition(void) {
     /* Set variables used */
     GPIO_InitTypeDef GPIO_InitStruct;
     EXTI_InitTypeDef EXTI_InitStruct;
@@ -291,28 +293,34 @@ void EXTI15_10_IRQHandler(void) {
     /* Make sure that interrupt flag is set */
     if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
         /* Do your stuff when PB10 is changed */
+        TIME_IGNITION[0] = TIM_GetCounter(TIM2); /* recuperation temps */
         TM_USB_VCP_Puts("PB10 ");
 
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line10);
     }
     else if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
+        TIME_IGNITION[1] = TIM_GetCounter(TIM2);
         TM_USB_VCP_Puts("PB11 ");
         EXTI_ClearITPendingBit(EXTI_Line11);
     }
     else if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
+        TIME_IGNITION[2] = TIM_GetCounter(TIM2);
         TM_USB_VCP_Puts("PB12 ");
         EXTI_ClearITPendingBit(EXTI_Line12);
     }
     else if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
+        TIME_IGNITION[3] = TIM_GetCounter(TIM2);
         TM_USB_VCP_Puts("PB13 ");
         EXTI_ClearITPendingBit(EXTI_Line13);
     }
     else if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
+        TIME_IGNITION[4] = TIM_GetCounter(TIM2);
         TM_USB_VCP_Puts("PB14 ");
         EXTI_ClearITPendingBit(EXTI_Line14);
     }
     else if (EXTI_GetITStatus(EXTI_Line15) != RESET) {
+        TIME_IGNITION[5] = TIM_GetCounter(TIM2);
         TM_USB_VCP_Puts("PB15 ");
         EXTI_ClearITPendingBit(EXTI_Line15);
     }
