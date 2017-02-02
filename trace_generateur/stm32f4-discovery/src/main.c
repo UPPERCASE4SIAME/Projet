@@ -24,6 +24,8 @@
  
 void Configure_PD0(void);
 void EXTI0_IRQHandler(void);
+void Configure_PB12(void);
+void EXTI15_10_IRQHandler(void);
 
 /*  Le baudrate de l'UART se change dans le fichier 
  *  lib/src/peripherals/stm32f4xx_usart.c
@@ -53,6 +55,7 @@ int main(void) {
 
     /* Configure PD0 as interrupt */
     Configure_PD0();
+    Configure_PB12();
     
     while (1) {
 /*
@@ -175,3 +178,143 @@ void Configure_PD0(void) {
     /* Add to NVIC */
     NVIC_Init(&NVIC_InitStruct);
 } 
+
+void Configure_PB12(void) {
+    /* Set variables used */
+    GPIO_InitTypeDef GPIO_InitStruct;
+    EXTI_InitTypeDef EXTI_InitStruct;
+    NVIC_InitTypeDef NVIC_InitStruct;
+    
+    /* Enable clock for GPIOB */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    /* Enable clock for SYSCFG */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    
+    /* Set pin as input */
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+   
+    /* ################
+     * #    EXTI      #
+     * ################ */
+
+    /* ### PIN 10 ### */
+ 
+    /* Tell system that you will use PB10 for EXTI_Line10 */
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource10);
+    
+    /* PB10 is connected to EXTI_Line10 */
+    EXTI_InitStruct.EXTI_Line = EXTI_Line10;
+    /* Enable interrupt */
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    /* Interrupt mode */
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    /* Triggers on rising and falling edge */
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    /* Add to EXTI */
+    EXTI_Init(&EXTI_InitStruct);
+
+    /* ### PIN 11 ### */
+
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource11);
+    
+    EXTI_InitStruct.EXTI_Line = EXTI_Line11;
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_Init(&EXTI_InitStruct);
+
+    /* ### PIN 12 ### */
+
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource12);
+    
+    EXTI_InitStruct.EXTI_Line = EXTI_Line12;
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_Init(&EXTI_InitStruct);
+
+    /* ### PIN 13 ### */
+
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource13);
+    
+    EXTI_InitStruct.EXTI_Line = EXTI_Line13;
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_Init(&EXTI_InitStruct);
+
+    /* ### PIN 14 ### */
+
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource14);
+    
+    EXTI_InitStruct.EXTI_Line = EXTI_Line14;
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_Init(&EXTI_InitStruct);
+
+    /* ### PIN 15 ### */
+
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource15);
+    
+    EXTI_InitStruct.EXTI_Line = EXTI_Line15;
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising;
+    EXTI_Init(&EXTI_InitStruct);
+
+    /* ################
+     * #  FIN  EXTI   #
+     * ################ */
+
+
+    /* Add IRQ vector to NVIC */
+    /* PB12 is connected to EXTI_Line12, which has EXTI15_10_IRQn vector */
+    NVIC_InitStruct.NVIC_IRQChannel = EXTI15_10_IRQn;
+    /* Set priority */
+    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0x00;
+    /* Set sub priority */
+    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0x01;
+    /* Enable interrupt */
+    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    /* Add to NVIC */
+    NVIC_Init(&NVIC_InitStruct);
+}
+
+/* Handle PB12 interrupt */
+void EXTI15_10_IRQHandler(void) {
+    /* Make sure that interrupt flag is set */
+    if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
+        /* Do your stuff when PB10 is changed */
+        TM_USB_VCP_Puts("PB10 ");
+
+        /* Clear interrupt flag */
+        EXTI_ClearITPendingBit(EXTI_Line10);
+    }
+    else if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
+        TM_USB_VCP_Puts("PB11 ");
+        EXTI_ClearITPendingBit(EXTI_Line11);
+    }
+    else if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
+        TM_USB_VCP_Puts("PB12 ");
+        EXTI_ClearITPendingBit(EXTI_Line12);
+    }
+    else if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
+        TM_USB_VCP_Puts("PB13 ");
+        EXTI_ClearITPendingBit(EXTI_Line13);
+    }
+    else if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
+        TM_USB_VCP_Puts("PB14 ");
+        EXTI_ClearITPendingBit(EXTI_Line14);
+    }
+    else if (EXTI_GetITStatus(EXTI_Line15) != RESET) {
+        TM_USB_VCP_Puts("PB15 ");
+        EXTI_ClearITPendingBit(EXTI_Line15);
+    }
+    
+}
