@@ -12,8 +12,11 @@
  **/
 #include "stm32f4xx.h"
 #include "stm32f4xx_exti.h"
+#include "stm32f4xx_tim.h"
 #include "stm32f4xx_syscfg.h"
 #include "misc.h"
+#include "stdlib.h"
+#include "string.h"
 
 #include "tm_stm32f4_usb_vcp.h"
 #include "tm_stm32f4_disco.h"
@@ -22,6 +25,18 @@
 void Configure_PD0(void);
 void EXTI0_IRQHandler(void);
 
+/*  Le baudrate de l'UART se change dans le fichier 
+ *  lib/src/peripherals/stm32f4xx_usart.c
+ *  ligne 343
+ */
+
+/* Timer
+ * Carte stm32f407VGT6 --> 168MHz
+ *
+ * TIM2
+ *
+ */
+
 int main(void) {
     uint8_t c;
     /* System Init -- UART */
@@ -29,7 +44,10 @@ int main(void) {
     
     /* Initialize LED's. Make sure to check settings for your board in tm_stm32f4_disco.h file */
     TM_DISCO_LedInit();
-    
+   
+    /* Initiallize Counter */
+    InitializeTimer();
+ 
     /* Initialize USB VCP */    
     TM_USB_VCP_Init();
 
@@ -60,19 +78,53 @@ int main(void) {
 /* Set interrupt handlers */
 /* Handle PD0 interrupt */
 void EXTI0_IRQHandler(void) {
+
+    int timerValue = 0;
+    char val[11];
+    //char buffer[10];
+
     /* Make sure that interrupt flag is set */
     if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
         /* Do your stuff when PD0 is changed */
 
         if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
+        {
+            TIM_SetCounter(TIM2, (uint32_t) 0);
+            TIM_Cmd(TIM2, ENABLE);
             TM_USB_VCP_Puts("USER BUTTON : pushed\n\r");
+        }
         else
-            TM_USB_VCP_Puts("USER BUTTON : released\n\r");
-        
+        {
+            timerValue = TIM_GetCounter(TIM2); 
+            TIM_Cmd(TIM2, DISABLE);
+            itoa(timerValue, val, 10);
+            //snprintf(buffer, 10, "%d", timerValue);
+            TM_USB_VCP_Puts("USER BUTTON : released after ");
+            TM_USB_VCP_Puts(val);
+            TM_USB_VCP_Puts("\r\n");
+        }
         
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line0);
     }
+}
+
+void InitializeTimer()
+{
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+ 
+    TIM_TimeBaseInitTypeDef timerInitStructure; 
+    //timerInitStructure.TIM_Prescaler = 40000;
+    /* Prescaller = 167 ==> 168Mh soit 168 ticks pour 1 us (prescaller_set + 1) */
+    timerInitStructure.TIM_Prescaler = 83;
+    timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    //timerInitStructure.TIM_Period = 500;
+    /* Periode maximum */
+    timerInitStructure.TIM_Period = 0xFFFFFFFF;
+    timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    timerInitStructure.TIM_RepetitionCounter = 0;
+    TIM_TimeBaseInit(TIM2, &timerInitStructure);
+    //TIM_Cmd(TIM2, ENABLE);
 }
 
 /* Configure pins to be interrupts */
