@@ -29,7 +29,7 @@ void MainWindow::on_browse_button_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName();
 
-    qDebug() << fileName;
+    //qDebug() << fileName;
 
     QLineEdit* browseEdit = ui->browseEdit;
 
@@ -97,17 +97,33 @@ void MainWindow::openTrace()
 void MainWindow::readLineFromTrace()
 {
     static QString line;
+    static QStringList values;
+
+    static QLabel* ignition1 = (QLabel*)ui->ignition1_value_label;
+    static QLabel* ignition2 = (QLabel*)ui->ignition2_value_label;
+    static QLabel* ignition3 = (QLabel*)ui->ignition3_value_label;
+    static QLabel* ignition4 = (QLabel*)ui->ignition4_value_label;
+    static QLabel* ignition5 = (QLabel*)ui->ignition5_value_label;
+    static QLabel* ignition6 = (QLabel*)ui->ignition6_value_label;
+
+    static QSpinBox* rotation_counter = (QSpinBox*)ui->current_rotation_counter;
 
     if(!traceFileIn->atEnd())
     {
         line = traceFileIn->readLine();
 
-//        (QLabel*)ui->ignition1_value_label->setText();
-//        (QLabel*)ui->ignition2_value_label->setText();
-//        (QLabel*)ui->ignition3_value_label->setText();
-//        (QLabel*)ui->ignition4_value_label->setText();
-//        (QLabel*)ui->ignition5_value_label->setText();
-//        (QLabel*)ui->ignition6_value_label->setText();
+        //qDebug() << line;
+
+        values = line.split(";");
+
+        ignition1->setText(values[1]);
+        ignition2->setText(values[2]);
+        ignition3->setText(values[3]);
+        ignition4->setText(values[4]);
+        ignition5->setText(values[5]);
+        ignition6->setText(values[6]);
+
+        rotation_counter->setValue(rotation_counter->value() + 1);
     }
     else
     {

@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QLabel>
+#include <QSpinBox>
 
 namespace Ui {
 class MainWindow;
