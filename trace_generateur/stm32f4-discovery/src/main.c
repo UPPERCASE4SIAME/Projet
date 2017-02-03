@@ -21,13 +21,15 @@
 #include "tm_stm32f4_usb_vcp.h"
 #include "tm_stm32f4_disco.h"
 #include "defines.h"
- 
+
+#define NB_BOUGIES 6
+
 void Configure_interrupt_rotary2(void);
 void EXTI0_IRQHandler(void);
 void Configure_interrupt_ignition(void);
 void EXTI15_10_IRQHandler(void);
 
-uint32_t TIME_IGNITION[6];
+uint32_t TIME_IGNITION[NB_BOUGIES];
 
 /*  Le baudrate de l'UART se change dans le fichier 
  *  lib/src/peripherals/stm32f4xx_usart.c
@@ -89,26 +91,28 @@ void EXTI0_IRQHandler(void) {
     //char buffer[10];
 
     /* Make sure that interrupt flag is set */
-    if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
+    if (EXTI_GetITStatus(EXTI_Line0) != RESET)
+    {
         /* Do your stuff when PD0 is changed */
+        timerValue = TIM_GetCounter(TIM2); /* Recup temps total cycle moteur */
+        itoa(timerValue, val, 10);
+            
+        /* remise a zero du compteur et start */
+        //TIM_Cmd(TIM2, DISABLE);
+        TIM_SetCounter(TIM2, (uint32_t) 0);
+        TIM_Cmd(TIM2, ENABLE);
 
-        if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
-        {
-            TIM_SetCounter(TIM2, (uint32_t) 0);
-            TIM_Cmd(TIM2, ENABLE);
-            TM_USB_VCP_Puts("USER BUTTON : pushed\n\r");
-        }
-        else
-        {
-            timerValue = TIM_GetCounter(TIM2); 
-            TIM_Cmd(TIM2, DISABLE);
-            itoa(timerValue, val, 10);
-            //snprintf(buffer, 10, "%d", timerValue);
-            TM_USB_VCP_Puts("USER BUTTON : released after ");
-            TM_USB_VCP_Puts(val);
-            TM_USB_VCP_Puts("\r\n");
-        }
+        TM_USB_VCP_Puts(val);
         
+        for (int i = 0 ; i < NB_BOUGIES; i++)
+        {
+            itoa(TIME_IGNITION[i], val, 10);
+            TM_USB_VCP_Putc(';');
+            TM_USB_VCP_Puts(val);
+        }
+    
+        TM_USB_VCP_Puts("\r\n");
+
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line0);
     }
@@ -140,8 +144,8 @@ void Configure_interrupt_rotary2(void) {
     NVIC_InitTypeDef NVIC_InitStruct;
     
     /* Enable clock for GPIOD */
-    //RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+    //RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
     /* Enable clock for SYSCFG */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
     
@@ -154,8 +158,8 @@ void Configure_interrupt_rotary2(void) {
     GPIO_Init(GPIOD, &GPIO_InitStruct);
     
     /* Tell system that you will use PD0 for EXTI_Line0 */
-    //SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD, EXTI_PinSource0);
-    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD, EXTI_PinSource0);
+    //SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
     
     /* PD0 is connected to EXTI_Line0 */
     EXTI_InitStruct.EXTI_Line = EXTI_Line0;
@@ -294,34 +298,28 @@ void EXTI15_10_IRQHandler(void) {
     if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
         /* Do your stuff when PB10 is changed */
         TIME_IGNITION[0] = TIM_GetCounter(TIM2); /* recuperation temps */
-        TM_USB_VCP_Puts("PB10 ");
 
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line10);
     }
     else if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
         TIME_IGNITION[1] = TIM_GetCounter(TIM2);
-        TM_USB_VCP_Puts("PB11 ");
         EXTI_ClearITPendingBit(EXTI_Line11);
     }
     else if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
         TIME_IGNITION[2] = TIM_GetCounter(TIM2);
-        TM_USB_VCP_Puts("PB12 ");
         EXTI_ClearITPendingBit(EXTI_Line12);
     }
     else if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
         TIME_IGNITION[3] = TIM_GetCounter(TIM2);
-        TM_USB_VCP_Puts("PB13 ");
         EXTI_ClearITPendingBit(EXTI_Line13);
     }
     else if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
         TIME_IGNITION[4] = TIM_GetCounter(TIM2);
-        TM_USB_VCP_Puts("PB14 ");
         EXTI_ClearITPendingBit(EXTI_Line14);
     }
     else if (EXTI_GetITStatus(EXTI_Line15) != RESET) {
         TIME_IGNITION[5] = TIM_GetCounter(TIM2);
-        TM_USB_VCP_Puts("PB15 ");
         EXTI_ClearITPendingBit(EXTI_Line15);
     }
     
