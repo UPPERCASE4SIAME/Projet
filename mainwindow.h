@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QLineEdit>
+#include <QDebug>
+#include <QTimer>
+#include <QLabel>
 
 namespace Ui {
 class MainWindow;
@@ -20,17 +24,30 @@ public:
 private slots:
     void on_browse_button_clicked();
 
-    void on_pushButton_clicked();
+    void on_current_rotation_counter_valueChanged(int arg1);
 
-    void on_step_number_valueChanged(int num);
+    void on_rotation_freq_counter_valueChanged(int newValue);
 
-    void on_steps_freq_valueChanged(int freq);
+    void on_execution_button_clicked();
 
-    void on_exec_button_clicked();
+    void on_browseEdit_editingFinished();
+
+    void readLineFromTrace();
+
+    void on_pause_button_clicked();
 
 private:
+
+    bool readyToRead = false;
+    QFile *traceFile;
+    QTextStream *traceFileIn;
+    QTimer *runTimer;
+    int stepDelay;
+
     Ui::MainWindow *ui;
-    QFile *trace;
+
+    void openTrace();
+    void stopRunning();
 };
 
 #endif // MAINWINDOW_H
