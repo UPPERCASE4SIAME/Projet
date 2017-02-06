@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QTimer>
 #include <QLabel>
-#include <QSpinBox>
 
 namespace Ui {
 class MainWindow;
@@ -25,7 +24,6 @@ public:
 private slots:
     void on_browse_button_clicked();
 
-    void on_current_rotation_counter_valueChanged(int arg1);
 
     void on_rotation_freq_counter_valueChanged(int newValue);
 
@@ -44,6 +42,8 @@ private:
     QTextStream *traceFileIn;
     QTimer *runTimer;
     int stepDelay;
+
+    int execution_counter;
 
     Ui::MainWindow *ui;
 

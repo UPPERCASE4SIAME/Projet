@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -33,8 +33,8 @@
      <widget class="QtCharts::QChartView" name="chartview_2">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>40</y>
+        <x>470</x>
+        <y>30</y>
         <width>581</width>
         <height>441</height>
        </rect>
@@ -93,9 +93,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>170</y>
-        <width>391</width>
-        <height>131</height>
+        <y>270</y>
+        <width>331</width>
+        <height>141</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -243,6 +243,107 @@
          </item>
         </layout>
        </item>
+       <item row="3" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>rpm moteur</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>110</y>
+        <width>331</width>
+        <height>116</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="execution_layout_2">
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <property name="bottomMargin">
+        <number>10</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_54">
+             <property name="text">
+              <string>Fichier d'enregistrement de la trace</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_30">
+             <item>
+              <widget class="QLineEdit" name="browseEdit_3">
+               <property name="text">
+                <string>/home/Kappa</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="browse_button_3">
+               <property name="text">
+                <string>Parcourir</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QPushButton" name="pause_button_3">
+             <property name="text">
+              <string>Commencer l'enregistrement</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -300,7 +401,7 @@
        <rect>
         <x>10</x>
         <y>100</y>
-        <width>331</width>
+        <width>291</width>
         <height>122</height>
        </rect>
       </property>
@@ -338,24 +439,24 @@
        <item>
         <layout class="QGridLayout" name="execution_rotation_layout">
          <item row="0" column="0">
-          <widget class="QLabel" name="current_rotation_label">
-           <property name="text">
-            <string>Tour moteur actuel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
           <widget class="QLabel" name="rotation_freq_label">
            <property name="text">
-            <string>Nombre de tours moteur par seconde</string>
+            <string>Nombre de tours moteur affichés par seconde</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="rotation_freq_counter"/>
-         </item>
          <item row="0" column="1">
-          <widget class="QSpinBox" name="current_rotation_counter"/>
+          <widget class="QSpinBox" name="rotation_freq_counter">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>50000</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -515,6 +616,27 @@
          </item>
         </layout>
        </item>
+       <item row="3" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>rpm moteur</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
      <widget class="QtCharts::QChartView" name="chartview">
@@ -547,24 +669,6 @@
      </widget>
     </widget>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1108</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>

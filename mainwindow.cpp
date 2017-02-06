@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
 
     stepDelay = 1;
+    execution_counter = 0;
 
     ui->setupUi(this);
 }
@@ -29,18 +30,11 @@ void MainWindow::on_browse_button_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName();
 
-    //qDebug() << fileName;
-
     QLineEdit* browseEdit = ui->browseEdit;
 
     browseEdit->setText(fileName);
 
     openTrace();
-}
-
-void MainWindow::on_current_rotation_counter_valueChanged(int arg1)
-{
-
 }
 
 void MainWindow::on_rotation_freq_counter_valueChanged(int newValue)
@@ -50,6 +44,11 @@ void MainWindow::on_rotation_freq_counter_valueChanged(int newValue)
 
 void MainWindow::on_execution_button_clicked()
 {
+    if(!readyToRead)
+    {
+        openTrace();
+    }
+
     if(readyToRead)
     {
         traceFileIn = new QTextStream(traceFile);
@@ -106,8 +105,6 @@ void MainWindow::readLineFromTrace()
     static QLabel* ignition5 = (QLabel*)ui->ignition5_value_label;
     static QLabel* ignition6 = (QLabel*)ui->ignition6_value_label;
 
-    static QSpinBox* rotation_counter = (QSpinBox*)ui->current_rotation_counter;
-
     if(!traceFileIn->atEnd())
     {
         line = traceFileIn->readLine();
@@ -123,11 +120,11 @@ void MainWindow::readLineFromTrace()
         ignition5->setText(values[5]);
         ignition6->setText(values[6]);
 
-        rotation_counter->setValue(rotation_counter->value() + 1);
     }
     else
     {
         stopRunning();
+        readyToRead = false;
     }
 }
 
