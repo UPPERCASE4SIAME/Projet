@@ -109,6 +109,7 @@ void EXTI0_IRQHandler(void) {
             itoa(TIME_IGNITION[i], val, 10);
             TM_USB_VCP_Putc(';');
             TM_USB_VCP_Puts(val);
+            TIME_IGNITION[i] = 0;
         }
     
         TM_USB_VCP_Puts("\r\n");
