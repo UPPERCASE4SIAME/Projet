@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#define EXEC_MODE_INDEX 0
+#define TRACE_MODE_INDEX 1
+#define WCET_MODE_INDEX 2
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -10,6 +14,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     runTimer = new QTimer(this);
     connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
+
+
+    ignition1 = new QLabel();
+    ignition2 = new QLabel();
+    ignition3 = new QLabel();
+    ignition4 = new QLabel();
+    ignition5 = new QLabel();
+    ignition6 = new QLabel();
 
     stepDelay = 1;
     execution_counter = 0;
@@ -23,6 +35,13 @@ MainWindow::~MainWindow()
     delete traceFileIn;
     delete runTimer;
 
+    delete ignition1;
+    delete ignition2;
+    delete ignition3;
+    delete ignition4;
+    delete ignition5;
+    delete ignition6;
+
     delete ui;
 }
 
@@ -30,11 +49,25 @@ void MainWindow::on_browse_button_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName();
 
-    QLineEdit* browseEdit = ui->browseEdit;
+    browseEdit->setText(fileName);
+
+    openTrace();
+}
+
+void MainWindow::on_browse_button_exec_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName();
 
     browseEdit->setText(fileName);
 
     openTrace();
+
+    if(readyToRead)
+    {
+        traceFileIn = new QTextStream(traceFile);
+
+        runTimer->start(0);
+    }
 }
 
 void MainWindow::on_rotation_freq_counter_valueChanged(int newValue)
@@ -57,6 +90,7 @@ void MainWindow::on_execution_button_clicked()
     }
 }
 
+
 void MainWindow::on_pause_button_clicked()
 {
     stopRunning();
@@ -67,9 +101,21 @@ void MainWindow::on_browseEdit_editingFinished()
     openTrace();
 }
 
+void MainWindow::on_browseEdit_exec_editingFinished()
+{
+    openTrace();
+
+    if(readyToRead)
+    {
+        traceFileIn = new QTextStream(traceFile);
+
+        runTimer->start(0);
+    }
+}
+
 void MainWindow::openTrace()
 {
-    QLineEdit* browseEdit = ui->browseEdit;
+    browseEdit = ui->browseEdit;
 
     QString fileName = browseEdit->text();
 
@@ -98,18 +144,9 @@ void MainWindow::readLineFromTrace()
     static QString line;
     static QStringList values;
 
-    static QLabel* ignition1 = (QLabel*)ui->ignition1_value_label;
-    static QLabel* ignition2 = (QLabel*)ui->ignition2_value_label;
-    static QLabel* ignition3 = (QLabel*)ui->ignition3_value_label;
-    static QLabel* ignition4 = (QLabel*)ui->ignition4_value_label;
-    static QLabel* ignition5 = (QLabel*)ui->ignition5_value_label;
-    static QLabel* ignition6 = (QLabel*)ui->ignition6_value_label;
-
     if(!traceFileIn->atEnd())
     {
         line = traceFileIn->readLine();
-
-        //qDebug() << line;
 
         values = line.split(";");
 
@@ -133,3 +170,47 @@ void MainWindow::stopRunning()
     runTimer->stop();
 }
 
+void MainWindow::on_browseEdit_save_exec_editingFinished()
+{
+
+}
+
+void MainWindow::on_browse_button_save_exec_clicked()
+{
+
+}
+
+void MainWindow::on_save_button_exec_clicked()
+{
+
+}
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    /* depending on which tab we are, our line reading function is going to write to different labels
+       our file will also be different
+        those names can be changed in the form editor */
+    if(index == EXEC_MODE_INDEX)
+    {
+        browseEdit = (QLineEdit*)ui->browseEdit_exec;
+
+        ignition1 = (QLabel*)ui->ignition1_value_label_exec;
+        ignition2 = (QLabel*)ui->ignition2_value_label_exec;
+        ignition3 = (QLabel*)ui->ignition3_value_label_exec;
+        ignition4 = (QLabel*)ui->ignition4_value_label_exec;
+        ignition5 = (QLabel*)ui->ignition5_value_label_exec;
+        ignition6 = (QLabel*)ui->ignition6_value_label_exec;
+    }
+    else if (index == TRACE_MODE_INDEX)
+    {
+        browseEdit = (QLineEdit*)ui->browseEdit;
+
+        ignition1 = (QLabel*)ui->ignition1_value_label;
+        ignition2 = (QLabel*)ui->ignition2_value_label;
+        ignition3 = (QLabel*)ui->ignition3_value_label;
+        ignition4 = (QLabel*)ui->ignition4_value_label;
+        ignition5 = (QLabel*)ui->ignition5_value_label;
+        ignition6 = (QLabel*)ui->ignition6_value_label;
+    }
+
+}

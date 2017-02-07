@@ -35,15 +35,36 @@ private slots:
 
     void on_pause_button_clicked();
 
+    void on_browseEdit_exec_editingFinished();
+
+    void on_browse_button_exec_clicked();
+
+    void on_browseEdit_save_exec_editingFinished();
+
+    void on_browse_button_save_exec_clicked();
+
+    void on_save_button_exec_clicked();
+
+    void on_tabWidget_currentChanged(int index);
+
 private:
 
-    bool readyToRead = false;
+    bool readyToRead = false;    
     QFile *traceFile;
     QTextStream *traceFileIn;
+    QLineEdit* browseEdit;
+
+
     QTimer *runTimer;
     int stepDelay;
-
     int execution_counter;
+
+    QLabel* ignition1;
+    QLabel* ignition2;
+    QLabel* ignition3;
+    QLabel* ignition4;
+    QLabel* ignition5;
+    QLabel* ignition6;
 
     Ui::MainWindow *ui;
 

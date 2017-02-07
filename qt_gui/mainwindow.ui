@@ -34,7 +34,7 @@
       <property name="geometry">
        <rect>
         <x>470</x>
-        <y>30</y>
+        <y>0</y>
         <width>581</width>
         <height>441</height>
        </rect>
@@ -72,14 +72,14 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_29">
          <item>
-          <widget class="QLineEdit" name="browseEdit_2">
+          <widget class="QLineEdit" name="browseEdit_exec">
            <property name="text">
             <string>/dev/blah</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="browse_button_2">
+          <widget class="QPushButton" name="browse_button_exec">
            <property name="text">
             <string>Parcourir</string>
            </property>
@@ -93,9 +93,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>270</y>
+        <y>250</y>
         <width>331</width>
-        <height>141</height>
+        <height>161</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -120,14 +120,14 @@
        <item row="0" column="1">
         <layout class="QHBoxLayout" name="ignition4_layout_2">
          <item>
-          <widget class="QLabel" name="ignition4_title_label_2">
+          <widget class="QLabel" name="ignition4_title_label_exec">
            <property name="text">
             <string>Bougie 4</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="ignition4_value_label_2">
+          <widget class="QLabel" name="ignition4_value_label_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -141,14 +141,14 @@
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="ignition3_layout_2">
          <item>
-          <widget class="QLabel" name="ignition3_title_label_2">
+          <widget class="QLabel" name="ignition3_title_label_exec">
            <property name="text">
             <string>Bougie 3</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="ignition3_value_label_2">
+          <widget class="QLabel" name="ignition3_value_label_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -162,14 +162,14 @@
        <item row="2" column="1">
         <layout class="QHBoxLayout" name="ignition6_layout_2">
          <item>
-          <widget class="QLabel" name="ignition6_title_label_2">
+          <widget class="QLabel" name="ignition6_title_label_exec">
            <property name="text">
             <string>Bougie 6</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="ignition6_value_label_2">
+          <widget class="QLabel" name="ignition6_value_label_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -183,14 +183,14 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="ignition2_layout_2">
          <item>
-          <widget class="QLabel" name="ignition2_title_label_2">
+          <widget class="QLabel" name="ignition2_title_label_exec">
            <property name="text">
             <string>Bougie 2</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="ignition2_value_label_2">
+          <widget class="QLabel" name="ignition2_value_label_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -204,14 +204,14 @@
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="ignition5_layout_2">
          <item>
-          <widget class="QLabel" name="ignition5_title_label_2">
+          <widget class="QLabel" name="ignition5_title_label_exec">
            <property name="text">
             <string>Bougie 5</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="ignition5_value_label_2">
+          <widget class="QLabel" name="ignition5_value_label_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -225,14 +225,14 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="ignition1_layout_2">
          <item>
-          <widget class="QLabel" name="ignition1_title_label_2">
+          <widget class="QLabel" name="ignition1_title_label_exec">
            <property name="text">
             <string>Bougie 1</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="ignition1_value_label_2">
+          <widget class="QLabel" name="ignition1_value_label_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -246,14 +246,14 @@
        <item row="3" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QLabel" name="engine_rpm_exec">
            <property name="text">
             <string>rpm moteur</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="engine_rpm_value_exec">
            <property name="text">
             <string>0</string>
            </property>
@@ -314,14 +314,14 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_30">
              <item>
-              <widget class="QLineEdit" name="browseEdit_3">
+              <widget class="QLineEdit" name="browseEdit__save_exec">
                <property name="text">
                 <string>/home/Kappa</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="browse_button_3">
+              <widget class="QPushButton" name="browse_button_save_exec">
                <property name="text">
                 <string>Parcourir</string>
                </property>
@@ -334,7 +334,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QPushButton" name="pause_button_3">
+            <widget class="QPushButton" name="save_button_exec">
              <property name="text">
               <string>Commencer l'enregistrement</string>
              </property>
