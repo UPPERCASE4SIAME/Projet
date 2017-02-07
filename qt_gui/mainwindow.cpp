@@ -23,10 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ignition5 = new QLabel();
     ignition6 = new QLabel();
 
+    browseEdit = new QLineEdit();
+
     stepDelay = 1;
     execution_counter = 0;
 
     ui->setupUi(this);
+
+    init_displays();
 }
 
 MainWindow::~MainWindow()
@@ -43,6 +47,37 @@ MainWindow::~MainWindow()
     delete ignition6;
 
     delete ui;
+}
+
+void MainWindow::init_displays()
+{
+    int index = ui->tabWidget->currentIndex();
+
+    /* depending on which tab we are on, our line reading function is going to write to different labels
+       our file will also be different
+        those names can be changed in the form editor */
+    if(index == EXEC_MODE_INDEX)
+    {
+        browseEdit = (QLineEdit*)ui->browseEdit_exec;
+
+        ignition1 = (QLabel*)ui->ignition1_value_label_exec;
+        ignition2 = (QLabel*)ui->ignition2_value_label_exec;
+        ignition3 = (QLabel*)ui->ignition3_value_label_exec;
+        ignition4 = (QLabel*)ui->ignition4_value_label_exec;
+        ignition5 = (QLabel*)ui->ignition5_value_label_exec;
+        ignition6 = (QLabel*)ui->ignition6_value_label_exec;
+    }
+    else if (index == TRACE_MODE_INDEX)
+    {
+        browseEdit = (QLineEdit*)ui->browseEdit;
+
+        ignition1 = (QLabel*)ui->ignition1_value_label;
+        ignition2 = (QLabel*)ui->ignition2_value_label;
+        ignition3 = (QLabel*)ui->ignition3_value_label;
+        ignition4 = (QLabel*)ui->ignition4_value_label;
+        ignition5 = (QLabel*)ui->ignition5_value_label;
+        ignition6 = (QLabel*)ui->ignition6_value_label;
+    }
 }
 
 void MainWindow::on_browse_button_clicked()
@@ -115,8 +150,6 @@ void MainWindow::on_browseEdit_exec_editingFinished()
 
 void MainWindow::openTrace()
 {
-    browseEdit = ui->browseEdit;
-
     QString fileName = browseEdit->text();
 
     QFileInfo check_traceFile(fileName);
@@ -144,9 +177,27 @@ void MainWindow::readLineFromTrace()
     static QString line;
     static QStringList values;
 
+    static QRegExp lineFormatExp("\\d+;\\d+;\\d+;\\d+;\\d+;\\d+;\\d+");
+
+    qDebug() << "reading line";
+
     if(!traceFileIn->atEnd())
     {
         line = traceFileIn->readLine();
+
+        if(line.isEmpty())
+        {
+            return;
+        }
+
+        if(!line.contains(lineFormatExp))
+        {
+            stopRunning();
+
+            qDebug() << "File format is wrong";
+
+            return;
+        }
 
         values = line.split(";");
 
@@ -187,30 +238,5 @@ void MainWindow::on_save_button_exec_clicked()
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    /* depending on which tab we are, our line reading function is going to write to different labels
-       our file will also be different
-        those names can be changed in the form editor */
-    if(index == EXEC_MODE_INDEX)
-    {
-        browseEdit = (QLineEdit*)ui->browseEdit_exec;
-
-        ignition1 = (QLabel*)ui->ignition1_value_label_exec;
-        ignition2 = (QLabel*)ui->ignition2_value_label_exec;
-        ignition3 = (QLabel*)ui->ignition3_value_label_exec;
-        ignition4 = (QLabel*)ui->ignition4_value_label_exec;
-        ignition5 = (QLabel*)ui->ignition5_value_label_exec;
-        ignition6 = (QLabel*)ui->ignition6_value_label_exec;
-    }
-    else if (index == TRACE_MODE_INDEX)
-    {
-        browseEdit = (QLineEdit*)ui->browseEdit;
-
-        ignition1 = (QLabel*)ui->ignition1_value_label;
-        ignition2 = (QLabel*)ui->ignition2_value_label;
-        ignition3 = (QLabel*)ui->ignition3_value_label;
-        ignition4 = (QLabel*)ui->ignition4_value_label;
-        ignition5 = (QLabel*)ui->ignition5_value_label;
-        ignition6 = (QLabel*)ui->ignition6_value_label;
-    }
-
+    init_displays();
 }

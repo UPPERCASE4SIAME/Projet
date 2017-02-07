@@ -70,6 +70,7 @@ private:
 
     void openTrace();
     void stopRunning();
+    void init_displays();
 };
 
 #endif // MAINWINDOW_H
