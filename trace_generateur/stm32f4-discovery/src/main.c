@@ -24,12 +24,17 @@
 
 #define NB_BOUGIES 6
 
+#define TRUE 1
+#define FALSE 0
+
 void Configure_interrupt_rotary2(void);
 void EXTI0_IRQHandler(void);
 void Configure_interrupt_ignition(void);
 void EXTI15_10_IRQHandler(void);
 
 uint32_t TIME_IGNITION[NB_BOUGIES];
+
+int ready;
 
 /*  Le baudrate de l'UART se change dans le fichier 
  *  lib/src/peripherals/stm32f4xx_usart.c
@@ -60,6 +65,8 @@ int main(void) {
     /* Configure PD0 as interrupt */
     Configure_interrupt_rotary2();
     Configure_interrupt_ignition();
+
+    ready = TRUE;
     
     while (1) {
 /*
@@ -84,7 +91,8 @@ int main(void) {
 
 /* Set interrupt handlers */
 /* Handle PD0 interrupt */
-void EXTI0_IRQHandler(void) {
+void EXTI0_IRQHandler(void) 
+{
 
     int timerValue = 0;
     char val[11];
@@ -94,25 +102,41 @@ void EXTI0_IRQHandler(void) {
     if (EXTI_GetITStatus(EXTI_Line0) != RESET)
     {
         /* Do your stuff when PD0 is changed */
-        timerValue = TIM_GetCounter(TIM2); /* Recup temps total cycle moteur */
-        itoa(timerValue, val, 10);
-            
-        /* remise a zero du compteur et start */
-        //TIM_Cmd(TIM2, DISABLE);
-        TIM_SetCounter(TIM2, (uint32_t) 0);
-        TIM_Cmd(TIM2, ENABLE);
 
-        TM_USB_VCP_Puts(val);
-        
-        for (int i = 0 ; i < NB_BOUGIES; i++)
+        if (!ready)
         {
-            itoa(TIME_IGNITION[i], val, 10);
-            TM_USB_VCP_Putc(';');
-            TM_USB_VCP_Puts(val);
-            TIME_IGNITION[i] = 0;
+                // Start counter
+                TIM_Cmd(TIM2, ENABLE);
+
+                ready = TRUE;
+        } 
+        else 
+        {
+                timerValue = TIM_GetCounter(TIM2); // Recup temps total cycle moteur
+
+                ready = FALSE;
+
+                // Stop counter
+                TIM_Cmd(TIM2, DISABLE);
+                // reset counter
+                TIM_SetCounter(TIM2, (uint32_t) 0);
+
+                itoa(timerValue, val, 10);
+
+                TM_USB_VCP_Puts(val); // affichage du temps du cycle
+
+                // affichage des valeur des bougies
+                for (int i = 0; i < NB_BOUGIES; i++)
+                {
+                    itoa(TIME_IGNITION[i], val, 10);
+                    TM_USB_VCP_Putc(';');
+                    TM_USB_VCP_Puts(val);
+                    TIME_IGNITION[i] = 0;
+                }
+            
+                TM_USB_VCP_Puts("\r\n");
+
         }
-    
-        TM_USB_VCP_Puts("\r\n");
 
         /* Clear interrupt flag */
         EXTI_ClearITPendingBit(EXTI_Line0);
@@ -295,33 +319,36 @@ void Configure_interrupt_ignition(void) {
 
 /* Handle PB12 interrupt */
 void EXTI15_10_IRQHandler(void) {
-    /* Make sure that interrupt flag is set */
-    if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
-        /* Do your stuff when PB10 is changed */
-        TIME_IGNITION[0] = TIM_GetCounter(TIM2); /* recuperation temps */
+    if (ready)
+    {
+            /* Make sure that interrupt flag is set */
+            if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
+                /* Do your stuff when PB10 is changed */
+                TIME_IGNITION[0] = TIM_GetCounter(TIM2); /* recuperation temps */
 
-        /* Clear interrupt flag */
-        EXTI_ClearITPendingBit(EXTI_Line10);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
-        TIME_IGNITION[1] = TIM_GetCounter(TIM2);
-        EXTI_ClearITPendingBit(EXTI_Line11);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
-        TIME_IGNITION[2] = TIM_GetCounter(TIM2);
-        EXTI_ClearITPendingBit(EXTI_Line12);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
-        TIME_IGNITION[3] = TIM_GetCounter(TIM2);
-        EXTI_ClearITPendingBit(EXTI_Line13);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
-        TIME_IGNITION[4] = TIM_GetCounter(TIM2);
-        EXTI_ClearITPendingBit(EXTI_Line14);
-    }
-    else if (EXTI_GetITStatus(EXTI_Line15) != RESET) {
-        TIME_IGNITION[5] = TIM_GetCounter(TIM2);
-        EXTI_ClearITPendingBit(EXTI_Line15);
+                /* Clear interrupt flag */
+                EXTI_ClearITPendingBit(EXTI_Line10);
+            }
+            else if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
+                TIME_IGNITION[1] = TIM_GetCounter(TIM2);
+                EXTI_ClearITPendingBit(EXTI_Line11);
+            }
+            else if (EXTI_GetITStatus(EXTI_Line12) != RESET) {
+                TIME_IGNITION[2] = TIM_GetCounter(TIM2);
+                EXTI_ClearITPendingBit(EXTI_Line12);
+            }
+            else if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
+                TIME_IGNITION[3] = TIM_GetCounter(TIM2);
+                EXTI_ClearITPendingBit(EXTI_Line13);
+            }
+            else if (EXTI_GetITStatus(EXTI_Line14) != RESET) {
+                TIME_IGNITION[4] = TIM_GetCounter(TIM2);
+                EXTI_ClearITPendingBit(EXTI_Line14);
+            }
+            else if (EXTI_GetITStatus(EXTI_Line15) != RESET) {
+                TIME_IGNITION[5] = TIM_GetCounter(TIM2);
+                EXTI_ClearITPendingBit(EXTI_Line15);
+            }
     }
     
 }
