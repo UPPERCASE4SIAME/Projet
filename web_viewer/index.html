@@ -10,6 +10,10 @@
 			var log = document.getElementById('log');
 			
 			var wss = new WebSocket('ws://rpi1:8181');
+			
+			function prependChild(parent, newFirstChild) {
+				parent.insertBefore(newFirstChild, parent.firstChild);
+			}
 
 			wss.onopen = function () { console.log('Connected'); }
 			wss.onclose = function () { console.log('Disconnected'); }
@@ -17,8 +21,7 @@
 				var p = document.createElement('p');
 				var txt = document.createTextNode(message.data);
 				p.appendChild(txt);
-				log.appendChild(p);
-				console.log('Received: ' + message.data); 
+				prependChild(log, p);
 			}
 		</script>
 	</body>
