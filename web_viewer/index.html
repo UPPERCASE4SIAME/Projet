@@ -9,7 +9,7 @@
 		<script>
 			var log = document.getElementById('log');
 			
-			var wss = new WebSocket('ws://localhost:8181');
+			var wss = new WebSocket('ws://rpi1:8181');
 
 			wss.onopen = function () { console.log('Connected'); }
 			wss.onclose = function () { console.log('Disconnected'); }
