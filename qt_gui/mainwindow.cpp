@@ -48,28 +48,29 @@ void MainWindow::init_displays()
     /* depending on which tab we are on, our line reading function is going to write to different labels
        our file will also be different
         those names can be changed in the form editor */
-    if(index == EXEC_MODE_INDEX)
+    if (index == EXEC_MODE_INDEX)
     {
-        browseEdit = (QLineEdit*)ui->browseEdit_exec;
+        browseEdit = (QLineEdit *)ui->browseEdit_exec;
 
-        ignition1 = (QLabel*)ui->ignition1_value_label_exec;
-        ignition2 = (QLabel*)ui->ignition2_value_label_exec;
-        ignition3 = (QLabel*)ui->ignition3_value_label_exec;
-        ignition4 = (QLabel*)ui->ignition4_value_label_exec;
-        ignition5 = (QLabel*)ui->ignition5_value_label_exec;
-        ignition6 = (QLabel*)ui->ignition6_value_label_exec;
+        ignition1 = (QLabel *)ui->ignition1_value_label_exec;
+        ignition2 = (QLabel *)ui->ignition2_value_label_exec;
+        ignition3 = (QLabel *)ui->ignition3_value_label_exec;
+        ignition4 = (QLabel *)ui->ignition4_value_label_exec;
+        ignition5 = (QLabel *)ui->ignition5_value_label_exec;
+        ignition6 = (QLabel *)ui->ignition6_value_label_exec;
     }
-    else if (index == TRACE_MODE_INDEX)
-    {
-        browseEdit = (QLineEdit*)ui->browseEdit;
+    else
+        if (index == TRACE_MODE_INDEX)
+        {
+            browseEdit = (QLineEdit *)ui->browseEdit;
 
-        ignition1 = (QLabel*)ui->ignition1_value_label;
-        ignition2 = (QLabel*)ui->ignition2_value_label;
-        ignition3 = (QLabel*)ui->ignition3_value_label;
-        ignition4 = (QLabel*)ui->ignition4_value_label;
-        ignition5 = (QLabel*)ui->ignition5_value_label;
-        ignition6 = (QLabel*)ui->ignition6_value_label;
-    }
+            ignition1 = (QLabel *)ui->ignition1_value_label;
+            ignition2 = (QLabel *)ui->ignition2_value_label;
+            ignition3 = (QLabel *)ui->ignition3_value_label;
+            ignition4 = (QLabel *)ui->ignition4_value_label;
+            ignition5 = (QLabel *)ui->ignition5_value_label;
+            ignition6 = (QLabel *)ui->ignition6_value_label;
+        }
 }
 
 void MainWindow::on_browse_button_clicked()
@@ -90,7 +91,7 @@ void MainWindow::on_browse_button_exec_clicked()
 
     openTrace();
 
-    if(readyToRead)
+    if (readyToRead)
     {
         startRunning(0);
     }
@@ -108,25 +109,25 @@ void MainWindow::on_rotation_freq_counter_valueChanged(int newValue)
 
 void MainWindow::on_execution_button_clicked()
 {
-    if(!readyToRead)
+    if (!readyToRead)
     {
         openTrace();
     }
 
-    if(readyToRead)
+    if (readyToRead)
     {
-        startRunning(1000/stepDelay);
+        startRunning(1000 / stepDelay);
     }
 }
 
 void MainWindow::on_readDevice_button_clicked()
 {
-    if(!readyToRead)
+    if (!readyToRead)
     {
         openTrace();
     }
 
-    if(readyToRead)
+    if (readyToRead)
     {
         startRunning(0);
     }
@@ -136,17 +137,17 @@ void MainWindow::on_pause_button_clicked()
 {
     static bool paused = false;
 
-    if(paused)
+    if (paused)
     {
-        startRunning(1000/stepDelay);
-        ((QPushButton*)ui->pause_button)->setText("Pause");
+        startRunning(1000 / stepDelay);
+        ((QPushButton *)ui->pause_button)->setText("Pause");
 
         paused = false;
     }
     else
     {
         runTimer->stop();
-        ((QPushButton*)ui->pause_button)->setText("Resume");
+        ((QPushButton *)ui->pause_button)->setText("Resume");
 
         paused = true;
     }
@@ -162,7 +163,7 @@ void MainWindow::on_browseEdit_exec_editingFinished()
 {
     openTrace();
 
-    if(readyToRead)
+    if (readyToRead)
     {
         runTimer->start(0);
     }
@@ -175,10 +176,10 @@ void MainWindow::openTrace()
     QFileInfo check_traceFile(fileName);
 
     //we've opened a new trace, so we're on play mode now
-    ((QPushButton*)ui->pause_button)->setText("Pause");
+    ((QPushButton *)ui->pause_button)->setText("Pause");
 
     //if our trace file doesn't exist or it's not a valid file then we'll just wait for the user to give us another file
-    if(!check_traceFile.exists() || !check_traceFile.isReadable())
+    if (!check_traceFile.exists() || !check_traceFile.isReadable())
     {
         readyToRead = false;
 
@@ -208,44 +209,46 @@ void MainWindow::readLineFromTrace()
 
     static QRegExp lineFormatExp("\\d+;\\d+;\\d+;\\d+;\\d+;\\d+;\\d+");
 
+
     qDebug() << "reading line";
 
+    line = traceFileIn->readLine();
 
-    if(!traceFileIn->atEnd())
+
+    if (line.isEmpty())
     {
-        line = traceFileIn->readLine();
-
-        qDebug() << line;
-
-        if(line.isEmpty())
-        {
-            return;
-        }
-
-        if(!line.contains(lineFormatExp))
-        {
-            qDebug() << "Line format is wrong";
-
-            return;
-        }
-
-        values = line.split(";");
-
-        ignition1->setText(values[1]);
-        ignition2->setText(values[2]);
-        ignition3->setText(values[3]);
-        ignition4->setText(values[4]);
-        ignition5->setText(values[5]);
-        ignition6->setText(values[6]);
-
-    }
-    else
-    {
-        if(!stopTimer->isActive())
+        if (!stopTimer->isActive())
         {
             stopTimer->start(5000);
         }
+
+        return;
     }
+    else
+    {
+        if (stopTimer->isActive())
+        {
+            stopTimer->stop();
+        }
+    }
+
+    qDebug() << "content : " << line;
+
+    if (!line.contains(lineFormatExp))
+    {
+        qDebug() << "Line format is wrong";
+
+        return;
+    }
+
+    values = line.split(";");
+
+    ignition1->setText(values[1]);
+    ignition2->setText(values[2]);
+    ignition3->setText(values[3]);
+    ignition4->setText(values[4]);
+    ignition5->setText(values[5]);
+    ignition6->setText(values[6]);
 }
 
 void MainWindow::stopRunning()
@@ -279,4 +282,3 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 //{
 //    http://www.advsofteng.com/doc/cdcppdoc/realtimedemoqt.htm
 //}
-
