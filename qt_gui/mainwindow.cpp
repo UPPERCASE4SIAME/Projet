@@ -9,21 +9,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    traceFile = new QFile();
-    traceFileIn = new QTextStream();
-
     runTimer = new QTimer(this);
     connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
 
-
-    ignition1 = new QLabel();
-    ignition2 = new QLabel();
-    ignition3 = new QLabel();
-    ignition4 = new QLabel();
-    ignition5 = new QLabel();
-    ignition6 = new QLabel();
-
-    browseEdit = new QLineEdit();
+    stopTimer = new QTimer(this);
+    connect(stopTimer, SIGNAL(timeout()), this, SLOT(stopRunning()));
 
     stepDelay = 1;
     execution_counter = 0;
@@ -45,6 +35,8 @@ MainWindow::~MainWindow()
     delete ignition4;
     delete ignition5;
     delete ignition6;
+
+    delete browseEdit;
 
     delete ui;
 }
@@ -89,6 +81,7 @@ void MainWindow::on_browse_button_clicked()
     openTrace();
 }
 
+
 void MainWindow::on_browse_button_exec_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName();
@@ -99,10 +92,13 @@ void MainWindow::on_browse_button_exec_clicked()
 
     if(readyToRead)
     {
-        traceFileIn = new QTextStream(traceFile);
-
-        runTimer->start(0);
+        startRunning(0);
     }
+}
+
+void MainWindow::startRunning(float delay)
+{
+    runTimer->start(delay);
 }
 
 void MainWindow::on_rotation_freq_counter_valueChanged(int newValue)
@@ -119,16 +115,42 @@ void MainWindow::on_execution_button_clicked()
 
     if(readyToRead)
     {
-        traceFileIn = new QTextStream(traceFile);
-
-        runTimer->start(1000/stepDelay);
+        startRunning(1000/stepDelay);
     }
 }
 
+void MainWindow::on_readDevice_button_clicked()
+{
+    if(!readyToRead)
+    {
+        openTrace();
+    }
+
+    if(readyToRead)
+    {
+        startRunning(0);
+    }
+}
 
 void MainWindow::on_pause_button_clicked()
 {
-    stopRunning();
+    static bool paused = false;
+
+    if(paused)
+    {
+        startRunning(1000/stepDelay);
+        ((QPushButton*)ui->pause_button)->setText("Pause");
+
+        paused = false;
+    }
+    else
+    {
+        runTimer->stop();
+        ((QPushButton*)ui->pause_button)->setText("Resume");
+
+        paused = true;
+    }
+
 }
 
 void MainWindow::on_browseEdit_editingFinished()
@@ -142,8 +164,6 @@ void MainWindow::on_browseEdit_exec_editingFinished()
 
     if(readyToRead)
     {
-        traceFileIn = new QTextStream(traceFile);
-
         runTimer->start(0);
     }
 }
@@ -154,10 +174,15 @@ void MainWindow::openTrace()
 
     QFileInfo check_traceFile(fileName);
 
+    //we've opened a new trace, so we're on play mode now
+    ((QPushButton*)ui->pause_button)->setText("Pause");
+
     //if our trace file doesn't exist or it's not a valid file then we'll just wait for the user to give us another file
-    if(!check_traceFile.exists() || !check_traceFile.isFile())
+    if(!check_traceFile.exists() || !check_traceFile.isReadable())
     {
         readyToRead = false;
+
+        qDebug() << "file doesn't exist or is unreadable";
         return;
     }
 
@@ -165,11 +190,15 @@ void MainWindow::openTrace()
 
     if (!traceFile->open(QIODevice::ReadOnly | QIODevice::Text))
     {
+
+        qDebug() << "couldn't open file";
         readyToRead = false;
         return;
     }
 
     readyToRead = true;
+
+    traceFileIn = new QTextStream(traceFile);
 }
 
 void MainWindow::readLineFromTrace()
@@ -192,9 +221,7 @@ void MainWindow::readLineFromTrace()
 
         if(!line.contains(lineFormatExp))
         {
-            stopRunning();
-
-            qDebug() << "File format is wrong";
+            qDebug() << "Line format is wrong";
 
             return;
         }
@@ -211,14 +238,18 @@ void MainWindow::readLineFromTrace()
     }
     else
     {
-        stopRunning();
-        readyToRead = false;
+        if(!stopTimer->isActive())
+        {
+            stopTimer->start(5000);
+        }
     }
 }
 
 void MainWindow::stopRunning()
 {
     runTimer->stop();
+    stopTimer->stop();
+    readyToRead = false;
 }
 
 void MainWindow::on_browseEdit_save_exec_editingFinished()
@@ -240,3 +271,9 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 {
     init_displays();
 }
+
+//void MainWindow::drawGraph()
+//{
+//    http://www.advsofteng.com/doc/cdcppdoc/realtimedemoqt.htm
+//}
+

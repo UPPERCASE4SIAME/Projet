@@ -46,7 +46,7 @@
         <x>10</x>
         <y>10</y>
         <width>291</width>
-        <height>80</height>
+        <height>94</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -74,7 +74,7 @@
          <item>
           <widget class="QLineEdit" name="browseEdit_exec">
            <property name="text">
-            <string>/dev/blah</string>
+            <string>/dev/ttyACM0</string>
            </property>
           </widget>
          </item>
@@ -82,6 +82,17 @@
           <widget class="QPushButton" name="browse_button_exec">
            <property name="text">
             <string>Parcourir</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="readDevice_button">
+           <property name="text">
+            <string>Lire</string>
            </property>
           </widget>
          </item>
@@ -314,7 +325,7 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_30">
              <item>
-              <widget class="QLineEdit" name="browseEdit__save_exec">
+              <widget class="QLineEdit" name="browseEdit_save_exec">
                <property name="text">
                 <string>/home/Kappa</string>
                </property>

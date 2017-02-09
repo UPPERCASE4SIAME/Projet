@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QLabel>
+#include <QPushButton>
 
 namespace Ui {
 class MainWindow;
@@ -47,6 +48,8 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_readDevice_button_clicked();
+
 private:
 
     bool readyToRead = false;    
@@ -56,6 +59,8 @@ private:
 
 
     QTimer *runTimer;
+    QTimer *stopTimer;
+
     int stepDelay;
     int execution_counter;
 
@@ -71,6 +76,7 @@ private:
     void openTrace();
     void stopRunning();
     void init_displays();
+    void startRunning(float delay);
 };
 
 #endif // MAINWINDOW_H
