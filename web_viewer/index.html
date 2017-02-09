@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>Remote EMSBench</title>
+	</head>
+	<body>
+		<div id="log" style="overflow: scroll"></div>
+		<script>
+			var log = document.getElementById('log');
+			
+			var wss = new WebSocket('ws://rpi1:8181');
+			
+			function prependChild(parent, newFirstChild) {
+				parent.insertBefore(newFirstChild, parent.firstChild);
+			}
+
+			wss.onopen = function () { console.log('Connected'); }
+			wss.onclose = function () { console.log('Disconnected'); }
+			wss.onmessage = function (message) { 
+				var p = document.createElement('p');
+				var txt = document.createTextNode(message.data);
+				p.appendChild(txt);
+				prependChild(log, p);
+			}
+		</script>
+	</body>
+</html>
+
