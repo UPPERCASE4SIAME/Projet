@@ -14,8 +14,10 @@
 			wss.onopen = function () { console.log('Connected'); }
 			wss.onclose = function () { console.log('Disconnected'); }
 			wss.onmessage = function (message) { 
+				var p = document.createElement('p');
 				var txt = document.createTextNode(message.data);
-				log.appendChild(txt);
+				p.appendChild(txt);
+				log.appendChild(p);
 				console.log('Received: ' + message.data); 
 			}
 		</script>
