@@ -93,7 +93,7 @@ void MainWindow::on_browse_button_exec_clicked()
 
     if (readyToRead)
     {
-        startRunning(0);
+        //startRunning(0);
     }
 }
 
@@ -130,6 +130,9 @@ void MainWindow::on_readDevice_button_clicked()
     if (readyToRead)
     {
         //startRunning(1);
+
+        QString line;
+        QStringList values;
 
         while(true)
         {
@@ -181,6 +184,9 @@ void MainWindow::on_browseEdit_exec_editingFinished()
     if (readyToRead)
     {
         //runTimer->start(1);
+
+        QString line;
+        QStringList values;
 
         while(true)
         {
