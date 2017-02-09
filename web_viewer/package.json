@@ -1,0 +1,27 @@
+{
+  "name": "web_viewer",
+  "version": "1.0.0",
+  "description": "A web interface for EMSBench",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uppercase4siame/projet.git"
+  },
+  "author": "Guillaume ROSADO rosado.guillaume@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uppercase4siame/projet/issues"
+  },
+  "homepage": "https://github.com/uppercase4siame/projet#readme",
+  "dependencies": {
+    "express": "^4.14.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "url": "^0.11.0",
+    "ws": "^2.0.3"
+  }
+}

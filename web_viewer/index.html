@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>Remote EMSBench</title>
+	</head>
+	<body>
+		<div id="log" style="overflow: scroll"></div>
+		<script>
+			var log = document.getElementById('log');
+			
+			var wss = new WebSocket('ws://localhost:8181');
+
+			wss.onopen = function () { console.log('Connected'); }
+			wss.onclose = function () { console.log('Disconnected'); }
+			wss.onmessage = function (message) { 
+				var txt = document.createTextNode(message.data);
+				log.appendChild(txt);
+				console.log('Received: ' + message.data); 
+			}
+		</script>
+	</body>
+</html>
+
