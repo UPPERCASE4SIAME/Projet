@@ -129,7 +129,22 @@ void MainWindow::on_readDevice_button_clicked()
 
     if (readyToRead)
     {
-        startRunning(0);
+        //startRunning(1);
+
+        while(true)
+        {
+            line = traceFileIn->readLine();
+
+            values = line.split(";");
+
+            ignition1->setText(values[1]);
+            ignition2->setText(values[2]);
+            ignition3->setText(values[3]);
+            ignition4->setText(values[4]);
+            ignition5->setText(values[5]);
+            ignition6->setText(values[6]);
+        }
+
     }
 }
 
@@ -165,7 +180,21 @@ void MainWindow::on_browseEdit_exec_editingFinished()
 
     if (readyToRead)
     {
-        runTimer->start(0);
+        //runTimer->start(1);
+
+        while(true)
+        {
+            line = traceFileIn->readLine();
+
+            values = line.split(";");
+
+            ignition1->setText(values[1]);
+            ignition2->setText(values[2]);
+            ignition3->setText(values[3]);
+            ignition4->setText(values[4]);
+            ignition5->setText(values[5]);
+            ignition6->setText(values[6]);
+        }
     }
 }
 
