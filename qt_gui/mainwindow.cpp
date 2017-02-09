@@ -210,27 +210,22 @@ void MainWindow::readLineFromTrace()
     static QRegExp lineFormatExp("\\d+;\\d+;\\d+;\\d+;\\d+;\\d+;\\d+");
 
 
-    qDebug() << "reading line";
+//    qDebug() << "reading line";
 
     line = traceFileIn->readLine();
 
 
     if (line.isEmpty())
     {
-        if (!stopTimer->isActive())
-        {
-            stopTimer->start(5000);
-        }
-
         return;
     }
-    else
-    {
-        if (stopTimer->isActive())
-        {
-            stopTimer->stop();
-        }
-    }
+//    else
+//    {
+//        if (stopTimer->isActive())
+//        {
+//            stopTimer->stop();
+//        }
+//    }
 
     qDebug() << "content : " << line;
 
