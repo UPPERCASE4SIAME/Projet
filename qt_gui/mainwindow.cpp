@@ -210,9 +210,12 @@ void MainWindow::readLineFromTrace()
 
     qDebug() << "reading line";
 
+
     if(!traceFileIn->atEnd())
     {
         line = traceFileIn->readLine();
+
+        qDebug() << line;
 
         if(line.isEmpty())
         {
