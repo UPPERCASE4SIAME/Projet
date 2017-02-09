@@ -189,7 +189,7 @@ void MainWindow::openTrace()
 
     traceFile = new QFile(fileName);
 
-    if (!traceFile->open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!traceFile->open(QIODevice::ReadOnly | QIODevice::Unbuffered | QIODevice::Text))
     {
 
         qDebug() << "couldn't open file";
@@ -217,6 +217,7 @@ void MainWindow::readLineFromTrace()
 
     if (line.isEmpty())
     {
+        qDebug() << "line is empty";
         return;
     }
 //    else
@@ -227,14 +228,14 @@ void MainWindow::readLineFromTrace()
 //        }
 //    }
 
-    qDebug() << "content : " << line;
+//    qDebug() << "content : " << line;
 
-    if (!line.contains(lineFormatExp))
-    {
-        qDebug() << "Line format is wrong";
+//    if (!line.contains(lineFormatExp))
+//    {
+//        qDebug() << "Line format is wrong";
 
-        return;
-    }
+//        return;
+//    }
 
     values = line.split(";");
 
