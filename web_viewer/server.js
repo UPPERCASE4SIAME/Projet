@@ -48,7 +48,7 @@ server.listen(8181, function listening () {
 
 /***** UART Stream *****************************************/
 
-const uart = fs.createReadStream('/dev/stdin')
+const uart = fs.createReadStream('/dev/ttyACM0')
 
 // const log = fs.createWriteStream('logs.txt')
 // uart.pipe(log)
