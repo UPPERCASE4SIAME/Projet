@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QTextCodec>
 
 namespace Ui {
@@ -27,7 +28,6 @@ public:
 private slots:
     void on_browse_button_clicked();
 
-
     void on_rotation_freq_counter_valueChanged(int newValue);
 
     void on_execution_button_clicked();
@@ -35,6 +35,8 @@ private slots:
     void on_browseEdit_editingFinished();
 
     void readLineFromTrace();
+    
+    void readLineFromDevice();
 
     void on_pause_button_clicked();
 
@@ -76,10 +78,10 @@ private:
 
     void openTrace();
     void stopRunning();
-    void init_displays();
+    void initDisplays(int index);
     void startRunning(float delay);
     void openDevice();
-    void readLineFromDevice();
+    void changeTimerCalls(int index);
 };
 
 #endif // MAINWINDOW_H

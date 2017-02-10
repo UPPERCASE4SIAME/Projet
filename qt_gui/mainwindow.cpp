@@ -10,14 +10,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     runTimer = new QTimer(this);
-    connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
 
     stepDelay = 1;
     execution_counter = 0;
 
     ui->setupUi(this);
 
-    init_displays();
+	int curr_index = ui->tabWidget->currentIndex();
+
+    initDisplays(curr_index);
+    changeTimerCalls(curr_index);
 }
 
 MainWindow::~MainWindow()
@@ -40,10 +42,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::init_displays()
+void MainWindow::initDisplays(int index)
 {
-    int index = ui->tabWidget->currentIndex();
-
     /* depending on which tab we are on, our line reading function is going to write to different labels
        our file will also be different
         those names can be changed in the form editor */
@@ -71,6 +71,21 @@ void MainWindow::init_displays()
     }
 }
 
+void MainWindow::changeTimerCalls(int index)
+{
+	runTimer->stop();
+	if(index == EXEC_MODE_INDEX)
+	{
+		connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromDevice()));
+		disconnect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
+	}
+	if(index == TRACE_MODE_INDEX)
+	{
+		connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
+		disconnect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromDevice()));
+	}
+}
+
 void MainWindow::on_browse_button_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName();
@@ -87,12 +102,7 @@ void MainWindow::on_browse_button_exec_clicked()
 
     browseEdit->setText(fileName);
 
-    openTrace();
-
-    if(readyToRead)
-    {
-        startRunning(0);
-    }
+    openDevice();
 }
 
 void MainWindow::startRunning(float delay)
@@ -120,15 +130,7 @@ void MainWindow::on_execution_button_clicked()
 
 void MainWindow::on_readDevice_button_clicked()
 {
-    if(!readyToRead)
-    {
-        openTrace();
-    }
-
-    if(readyToRead)
-    {
-        startRunning(0);
-    }
+    openDevice();
 }
 
 void MainWindow::on_pause_button_clicked()
@@ -159,12 +161,7 @@ void MainWindow::on_browseEdit_editingFinished()
 
 void MainWindow::on_browseEdit_exec_editingFinished()
 {
-    openTrace();
-
-    if(readyToRead)
-    {
-        runTimer->start(0);
-    }
+    openDevice();
 }
 
 void MainWindow::openTrace()
@@ -203,18 +200,41 @@ void MainWindow::openTrace()
 void MainWindow::openDevice()
 {
     QString fileName = browseEdit->text();
+    
+    //QSerialPortInfo check_device(fileName);
 
-    //device = new QIODevice(fileName);
+    ////if our device doesn't exist or it's not a valid file then we'll just wait for the user to give us another file
+    //if(check_device.isNull() || check_device.isBusy())
+    //{
+        //readyToRead = false;
 
-    if (!traceFile->open(QIODevice::ReadOnly | QIODevice::Text))
+        //qDebug() << "device doesn't exist or is unreadable";
+        //return;
+    //}
+
+
+    device = new QSerialPort(this);
+    
+    qDebug() << "blah";
+    
+    device->setPortName(fileName);
+    
+    qDebug() << "meh";
+    
+
+    if (!device->open(QIODevice::ReadWrite))
     {
 
-        qDebug() << "couldn't open file";
+        qDebug() << "couldn't open device";
         readyToRead = false;
         return;
     }
 
     readyToRead = true;
+    
+    qDebug() << "device opened";
+    
+    connect(device, &QSerialPort::readyRead, this, &MainWindow::readLineFromDevice);
 }
 
 void MainWindow::readLineFromTrace()
@@ -254,7 +274,6 @@ void MainWindow::readLineFromTrace()
 
 void MainWindow::readLineFromDevice()
 {
-    static QString line;
     static QByteArray data;
     static QStringList values;
 
@@ -264,8 +283,10 @@ void MainWindow::readLineFromDevice()
     data = device->readLine();
 
     //transforms the byte array into a string
-    line = QTextCodec::codecForMib(1015)->toUnicode(data);
-
+    QString line(data);
+    
+    qDebug() << line;
+    
     if(line.isEmpty())
     {
         return;
@@ -311,7 +332,8 @@ void MainWindow::on_save_button_exec_clicked()
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    init_displays();
+    initDisplays(index);
+    changeTimerCalls(index);
 }
 
 //void MainWindow::drawGraph()

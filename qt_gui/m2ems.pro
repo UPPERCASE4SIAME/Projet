@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets charts core
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets charts core serialport
 
 TARGET = m2ems
 TEMPLATE = app
