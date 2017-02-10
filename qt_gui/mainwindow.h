@@ -9,6 +9,8 @@
 #include <QTimer>
 #include <QLabel>
 #include <QPushButton>
+#include <QtSerialPort/QSerialPort>
+#include <QTextCodec>
 
 namespace Ui {
 class MainWindow;
@@ -54,12 +56,11 @@ private:
 
     bool readyToRead = false;    
     QFile *traceFile;
+    QSerialPort *device;
     QTextStream *traceFileIn;
     QLineEdit* browseEdit;
 
-
     QTimer *runTimer;
-    QTimer *stopTimer;
 
     int stepDelay;
     int execution_counter;
@@ -77,6 +78,8 @@ private:
     void stopRunning();
     void init_displays();
     void startRunning(float delay);
+    void openDevice();
+    void readLineFromDevice();
 };
 
 #endif // MAINWINDOW_H

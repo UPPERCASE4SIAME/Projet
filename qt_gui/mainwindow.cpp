@@ -12,9 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
     runTimer = new QTimer(this);
     connect(runTimer, SIGNAL(timeout()), this, SLOT(readLineFromTrace()));
 
-    stopTimer = new QTimer(this);
-    connect(stopTimer, SIGNAL(timeout()), this, SLOT(stopRunning()));
-
     stepDelay = 1;
     execution_counter = 0;
 
@@ -27,6 +24,8 @@ MainWindow::~MainWindow()
 {
     delete traceFile;
     delete traceFileIn;
+    delete device;
+
     delete runTimer;
 
     delete ignition1;
@@ -145,7 +144,7 @@ void MainWindow::on_pause_button_clicked()
     }
     else
     {
-        runTimer->stop();
+        stopRunning();
         ((QPushButton*)ui->pause_button)->setText("Resume");
 
         paused = true;
@@ -201,14 +200,29 @@ void MainWindow::openTrace()
     traceFileIn = new QTextStream(traceFile);
 }
 
+void MainWindow::openDevice()
+{
+    QString fileName = browseEdit->text();
+
+    //device = new QIODevice(fileName);
+
+    if (!traceFile->open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+
+        qDebug() << "couldn't open file";
+        readyToRead = false;
+        return;
+    }
+
+    readyToRead = true;
+}
+
 void MainWindow::readLineFromTrace()
 {
     static QString line;
     static QStringList values;
 
     static QRegExp lineFormatExp("\\d+;\\d+;\\d+;\\d+;\\d+;\\d+;\\d+");
-
-    qDebug() << "reading line";
 
     if(!traceFileIn->atEnd())
     {
@@ -236,20 +250,48 @@ void MainWindow::readLineFromTrace()
         ignition6->setText(values[6]);
 
     }
-    else
+}
+
+void MainWindow::readLineFromDevice()
+{
+    static QString line;
+    static QByteArray data;
+    static QStringList values;
+
+    static QRegExp lineFormatExp("\\d+;\\d+;\\d+;\\d+;\\d+;\\d+;\\d+");
+
+
+    data = device->readLine();
+
+    //transforms the byte array into a string
+    line = QTextCodec::codecForMib(1015)->toUnicode(data);
+
+    if(line.isEmpty())
     {
-        if(!stopTimer->isActive())
-        {
-            stopTimer->start(5000);
-        }
+        return;
     }
+
+    if(!line.contains(lineFormatExp))
+    {
+        qDebug() << "Line format is wrong";
+
+        return;
+    }
+
+    values = line.split(";");
+
+    ignition1->setText(values[1]);
+    ignition2->setText(values[2]);
+    ignition3->setText(values[3]);
+    ignition4->setText(values[4]);
+    ignition5->setText(values[5]);
+    ignition6->setText(values[6]);
+
 }
 
 void MainWindow::stopRunning()
 {
     runTimer->stop();
-    stopTimer->stop();
-    readyToRead = false;
 }
 
 void MainWindow::on_browseEdit_save_exec_editingFinished()
