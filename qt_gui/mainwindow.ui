@@ -24,13 +24,13 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
       <string>Exécution courante</string>
      </attribute>
-     <widget class="QtCharts::QChartView" name="chartview_2">
+     <widget class="QtCharts::QChartView" name="ignition_chart_exec">
       <property name="geometry">
        <rect>
         <x>470</x>
@@ -650,7 +650,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QtCharts::QChartView" name="chartview">
+     <widget class="QtCharts::QChartView" name="ignition_chart_trace">
       <property name="geometry">
        <rect>
         <x>410</x>

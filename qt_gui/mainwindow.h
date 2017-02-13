@@ -10,7 +10,11 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QtSerialPort/QSerialPort>
+<<<<<<< Updated upstream
 #include <QtSerialPort/QSerialPortInfo>
+=======
+#include <QtCharts>
+>>>>>>> Stashed changes
 #include <QTextCodec>
 
 namespace Ui {
@@ -60,12 +64,13 @@ private:
     QFile *traceFile;
     QSerialPort *device;
     QTextStream *traceFileIn;
-    QLineEdit* browseEdit;
 
     QTimer *runTimer;
 
     int stepDelay;
     int execution_counter;
+
+    QLineEdit* browseEdit;
 
     QLabel* ignition1;
     QLabel* ignition2;
@@ -74,6 +79,17 @@ private:
     QLabel* ignition5;
     QLabel* ignition6;
 
+    QChart* ignitionChart;
+
+    QLineSeries* ignition1Data;
+    QLineSeries* ignition2Data;
+    QLineSeries* ignition3Data;
+    QLineSeries* ignition4Data;
+    QLineSeries* ignition5Data;
+    QLineSeries* ignition6Data;
+
+    QChartView* ignitionChartView;
+
     Ui::MainWindow *ui;
 
     void openTrace();
@@ -81,7 +97,12 @@ private:
     void initDisplays(int index);
     void startRunning(float delay);
     void openDevice();
+<<<<<<< Updated upstream
     void changeTimerCalls(int index);
+=======
+    void readLineFromDevice();
+    void drawGraph();
+>>>>>>> Stashed changes
 };
 
 #endif // MAINWINDOW_H

@@ -14,6 +14,15 @@ MainWindow::MainWindow(QWidget *parent) :
     stepDelay = 1;
     execution_counter = 0;
 
+    ignitionChart = new QChart();
+
+    ignition1Data = new QLineSeries();
+    ignition2Data = new QLineSeries();
+    ignition3Data = new QLineSeries();
+    ignition4Data = new QLineSeries();
+    ignition5Data = new QLineSeries();
+    ignition6Data = new QLineSeries();
+
     ui->setupUi(this);
 
 	int curr_index = ui->tabWidget->currentIndex();
@@ -57,6 +66,9 @@ void MainWindow::initDisplays(int index)
         ignition4 = (QLabel*)ui->ignition4_value_label_exec;
         ignition5 = (QLabel*)ui->ignition5_value_label_exec;
         ignition6 = (QLabel*)ui->ignition6_value_label_exec;
+
+        ignitionChartView = (QChartView*)ui->ignition_chart_exec;
+        ignitionChartView->setChart(ignitionChart);
     }
     else if (index == TRACE_MODE_INDEX)
     {
@@ -68,6 +80,9 @@ void MainWindow::initDisplays(int index)
         ignition4 = (QLabel*)ui->ignition4_value_label;
         ignition5 = (QLabel*)ui->ignition5_value_label;
         ignition6 = (QLabel*)ui->ignition6_value_label;
+
+        ignitionChartView = (QChartView*)ui->ignition_chart_trace;
+        ignitionChartView->setChart(ignitionChart);
     }
 }
 
@@ -336,8 +351,9 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     changeTimerCalls(index);
 }
 
-//void MainWindow::drawGraph()
-//{
-//    http://www.advsofteng.com/doc/cdcppdoc/realtimedemoqt.htm
-//}
+void MainWindow::drawGraph()
+{
+    //http://www.advsofteng.com/doc/cdcppdoc/realtimedemoqt.htm
+
+}
 
