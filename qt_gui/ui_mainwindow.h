@@ -38,7 +38,7 @@ public:
     QWidget *centralWidget;
     QTabWidget *tabWidget;
     QWidget *tab_3;
-    QtCharts::QChartView *chartview_2;
+    QtCharts::QChartView *ignition_chart_exec;
     QWidget *verticalLayoutWidget_3;
     QVBoxLayout *verticalLayout_5;
     QLabel *label_53;
@@ -118,7 +118,7 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *label;
     QLabel *label_2;
-    QtCharts::QChartView *chartview;
+    QtCharts::QChartView *ignition_chart_trace;
     QWidget *tab_2;
     QPlainTextEdit *plainTextEdit;
     QStatusBar *statusBar;
@@ -135,9 +135,9 @@ public:
         tabWidget->setGeometry(QRect(0, 0, 1121, 601));
         tab_3 = new QWidget();
         tab_3->setObjectName(QStringLiteral("tab_3"));
-        chartview_2 = new QtCharts::QChartView(tab_3);
-        chartview_2->setObjectName(QStringLiteral("chartview_2"));
-        chartview_2->setGeometry(QRect(470, 0, 581, 441));
+        ignition_chart_exec = new QtCharts::QChartView(tab_3);
+        ignition_chart_exec->setObjectName(QStringLiteral("ignition_chart_exec"));
+        ignition_chart_exec->setGeometry(QRect(470, 0, 581, 441));
         verticalLayoutWidget_3 = new QWidget(tab_3);
         verticalLayoutWidget_3->setObjectName(QStringLiteral("verticalLayoutWidget_3"));
         verticalLayoutWidget_3->setGeometry(QRect(10, 10, 291, 94));
@@ -562,9 +562,9 @@ public:
 
         gridLayout_2->addLayout(horizontalLayout_2, 3, 0, 1, 1);
 
-        chartview = new QtCharts::QChartView(tab);
-        chartview->setObjectName(QStringLiteral("chartview"));
-        chartview->setGeometry(QRect(410, 20, 681, 501));
+        ignition_chart_trace = new QtCharts::QChartView(tab);
+        ignition_chart_trace->setObjectName(QStringLiteral("ignition_chart_trace"));
+        ignition_chart_trace->setGeometry(QRect(410, 20, 681, 501));
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
@@ -579,7 +579,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

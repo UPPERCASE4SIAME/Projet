@@ -16,35 +16,51 @@ from pygame import joystick
 
 MAX    = 10000  # RPM
 NORMAL = 1500
-MIN    = 10
+MIN    = 200
 
-
-
-class Rotary_generatorPWM():
+class Rotary_generator(Thread):
 	PRIMARY_RPM   = 23 #output rotary primary 24
 	SECONDARY_RPM = 24 #output rotary secondary 2
 		
-	def __init__(self, freq):		
+	def __init__(self, rpm):
+		Thread.__init__(self)
+		self.__LATENCE = 5.0/rpm
 		GPIO.setmode(GPIO.BCM)
-		GPIO.setup(Rotary_generatorPWM.PRIMARY_RPM, GPIO.OUT)
-		GPIO.setup(Rotary_generatorPWM.SECONDARY_RPM, GPIO.OUT)
+		GPIO.setup(Rotary_generator.PRIMARY_RPM, GPIO.OUT)
+		GPIO.setup(Rotary_generator.SECONDARY_RPM, GPIO.OUT)
+		self.__keep_running = Event()
+		self.__keep_running.set()
 		
-		self.__pwm_primary = GPIO.PWM(Rotary_generatorPWM.PRIMARY_RPM, freq/60)
-		self.__pwm_secondary = GPIO.PWM(Rotary_generatorPWM.SECONDARY_RPM, freq/60)
-		
-		self.__pwm_primary.start(0.3)
-		self.__pwm_secondary.start(0.3)
-		
-	def update_freq(self, freq):
-		print(freq/60)
-		self.__pwm_primary.ChangeFrequency((freq*12)/60)
-		self.__pwm_secondary.ChangeFrequency(freq/60)
+	def run (self):
+		compteur = 0
+		while self.__keep_running.isSet():
+			if compteur % 2 != 0:
+				GPIO.output(Rotary_generator.PRIMARY_RPM, GPIO.HIGH)
+			else:
+				GPIO.output(Rotary_generator.PRIMARY_RPM, GPIO.LOW)
+
+			if compteur == 24/2:
+				GPIO.output(Rotary_generator.SECONDARY_RPM, GPIO.HIGH)
+			else:
+				GPIO.output(Rotary_generator.SECONDARY_RPM, GPIO.LOW)
+				
+			compteur = compteur + 1
+			compteur = compteur % 24
+
+			time.sleep(self.__LATENCE)
+	
+	def update_RPM(self, rpm):
+		self.__LATENCE = 5.0/rpm
+		print(self.__LATENCE)	
+	
+	def stop (self):
+		self.__keep_running.clear()
 		
 
 class Gamepad(Thread):
-	def __init__(self,callBack):
+	def __init__(self,rotary):
 		Thread.__init__(self)
-		self.__CallBack = callBack
+		self.__CallBack = rotary.update_RPM
 
 	def __thruttle_up(self, x):
 		""" translate x gamepad value to RPM value in speeding up"""
@@ -57,7 +73,7 @@ class Gamepad(Thread):
 		thruttle = (NORMAL - MIN) * ( x + 1)
 		thruttle = thruttle + MIN
 		return thruttle
-		
+	
 			
 	def run(self):
 		pygame.init()
@@ -65,38 +81,45 @@ class Gamepad(Thread):
 		jt.init()
 		old_value = 0
 		while True:
-			for event in pygame.event.get():
-				if (event.type == pygame.JOYBUTTONDOWN) and (event.button == 0):
-					GPIO.cleanup()
-					exit()
-				elif (event.type == pygame.JOYAXISMOTION) and (event.axis == 2):
-					if (abs(event.value - old_value) >= 0.02):
-						old_value = event.value
-						#Set value Rotary_generatorPWM
+			
+			event = pygame.event.wait()
+			
+			if (event.type == pygame.JOYBUTTONDOWN) and (event.button == 9):
+				rotary.stop()
+				GPIO.cleanup()	
+				print("exit")
+				exit()
+				
+			elif (event.type == pygame.JOYAXISMOTION) and (event.axis == 2):
+				#print(event.value)
+				if (abs(event.value - old_value) >= 0.05):
+					old_value = event.value
+					#Set value Rotary_generatorPWM
+					
+					if event.value == 0:
+						"""power setting"""
+						self.__CallBack(NORMAL)
 						
-						if event.value == 0:
-							"""power setting"""
-							self.__CallBack(NORMAL)
-							
-						elif event.value > 0:
-							"""thruttle down"""
-							thruttle_down = self.__thruttle_down(-event.value) 
-							self.__CallBack(thruttle_down)
-							
-						elif event.value > -1:
-							"""thruttle up"""
-							thruttle_up = self.__thruttle_up(-event.value) 
-							self.__CallBack(thruttle_up)
-							
-						else:
-							"""thruttle up"""
-							self.__CallBack(MAX)
+					elif event.value > 0:
+						"""thruttle down"""
+						thruttle_down = self.__thruttle_down(-event.value) 
+						self.__CallBack(thruttle_down)
+						
+					elif event.value > -1:
+						"""thruttle up"""
+						thruttle_up = self.__thruttle_up(-event.value) 
+						self.__CallBack(thruttle_up)
+						
+					else:
+						"""thruttle up"""
+						self.__CallBack(MAX)
 						
 
 if __name__ =="__main__":
-	print("Use the joystick to thruttle Up/Down.\nUse triangle to exit.") 
-	rotary = Rotary_generatorPWM(NORMAL)
-	gamepad = Gamepad(rotary.update_freq)
+	print("Use the joystick to thruttle Up/Down.\nUse START to exit.") 
+	rotary = Rotary_generator(NORMAL)
+	rotary.start()
+	gamepad = Gamepad(rotary)
 	gamepad.start()	
 
 	
