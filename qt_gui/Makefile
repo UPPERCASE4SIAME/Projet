@@ -906,6 +906,7 @@ moc_mainwindow.cpp: /usr/local/Qt-5.10.0/include/QtWidgets/QMainWindow \
 		/usr/local/Qt-5.10.0/include/QtCharts/qxylegendmarker.h \
 		/usr/local/Qt-5.10.0/include/QtCharts/qtchartsversion.h \
 		/usr/local/Qt-5.10.0/include/QtCore/QTextCodec \
+		/usr/local/Qt-5.10.0/include/QtCore/QMutex \
 		mainwindow.h \
 		moc_predefs.h \
 		/usr/local/Qt-5.10.0/bin/moc
@@ -1478,6 +1479,7 @@ main.o: main.cpp mainwindow.h \
 		/usr/local/Qt-5.10.0/include/QtCharts/qxylegendmarker.h \
 		/usr/local/Qt-5.10.0/include/QtCharts/qtchartsversion.h \
 		/usr/local/Qt-5.10.0/include/QtCore/QTextCodec \
+		/usr/local/Qt-5.10.0/include/QtCore/QMutex \
 		/usr/local/Qt-5.10.0/include/QtWidgets/QApplication
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
@@ -2029,6 +2031,7 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/usr/local/Qt-5.10.0/include/QtCharts/qxylegendmarker.h \
 		/usr/local/Qt-5.10.0/include/QtCharts/qtchartsversion.h \
 		/usr/local/Qt-5.10.0/include/QtCore/QTextCodec \
+		/usr/local/Qt-5.10.0/include/QtCore/QMutex \
 		ui_mainwindow.h \
 		/usr/local/Qt-5.10.0/include/QtCharts/QChartView \
 		/usr/local/Qt-5.10.0/include/QtWidgets/QAction \

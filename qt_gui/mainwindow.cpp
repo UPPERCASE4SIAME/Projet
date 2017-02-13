@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initDisplays(curr_index);
     changeTimerCalls(curr_index);
+    
+    drawMutex = new QMutex();
 }
 
 MainWindow::~MainWindow()
@@ -45,6 +47,8 @@ MainWindow::~MainWindow()
     delete ignition6;
 
     delete browseEdit;
+    
+    delete drawMutex;
 
     delete ui;
 }
@@ -280,7 +284,12 @@ void MainWindow::readLineFromTrace()
         ignition5->setText(values[5]);
         ignition6->setText(values[6]);
 
-        drawGraph(values);
+        if(drawMutex->try_lock())
+		{
+			drawGraph(values);
+			
+			drawMutex->unlock();
+		}
     }
     else
     {
@@ -326,7 +335,13 @@ void MainWindow::readLineFromDevice()
     ignition5->setText(values[5]);
     ignition6->setText(values[6]);
 
-    drawGraph(values);
+	if(drawMutex->try_lock())
+	{
+		drawGraph(values);
+		
+		drawMutex->unlock();
+	}
+    
 }
 
 void MainWindow::stopRunning()

@@ -13,6 +13,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QtCharts>
 #include <QTextCodec>
+#include <QMutex>
 
 namespace Ui {
 class MainWindow;
@@ -84,6 +85,8 @@ private:
     QLineSeries* ignition6Data;
 
     QChartView* ignitionChartView;
+    
+    QMutex* drawMutex;
 
     Ui::MainWindow *ui;
 
