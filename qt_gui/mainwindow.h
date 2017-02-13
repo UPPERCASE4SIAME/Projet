@@ -10,11 +10,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QtSerialPort/QSerialPort>
-<<<<<<< Updated upstream
 #include <QtSerialPort/QSerialPortInfo>
-=======
 #include <QtCharts>
->>>>>>> Stashed changes
 #include <QTextCodec>
 
 namespace Ui {
@@ -79,8 +76,6 @@ private:
     QLabel* ignition5;
     QLabel* ignition6;
 
-    QChart* ignitionChart;
-
     QLineSeries* ignition1Data;
     QLineSeries* ignition2Data;
     QLineSeries* ignition3Data;
@@ -97,12 +92,9 @@ private:
     void initDisplays(int index);
     void startRunning(float delay);
     void openDevice();
-<<<<<<< Updated upstream
     void changeTimerCalls(int index);
-=======
-    void readLineFromDevice();
-    void drawGraph();
->>>>>>> Stashed changes
+    void drawGraph(QStringList values);
+    void addIgnitionData(QLineSeries *series, int peak, int seriesNumber, int interval);
 };
 
 #endif // MAINWINDOW_H

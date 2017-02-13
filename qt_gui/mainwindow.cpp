@@ -14,8 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     stepDelay = 1;
     execution_counter = 0;
 
-    ignitionChart = new QChart();
-
     ignition1Data = new QLineSeries();
     ignition2Data = new QLineSeries();
     ignition3Data = new QLineSeries();
@@ -68,7 +66,6 @@ void MainWindow::initDisplays(int index)
         ignition6 = (QLabel*)ui->ignition6_value_label_exec;
 
         ignitionChartView = (QChartView*)ui->ignition_chart_exec;
-        ignitionChartView->setChart(ignitionChart);
     }
     else if (index == TRACE_MODE_INDEX)
     {
@@ -82,7 +79,6 @@ void MainWindow::initDisplays(int index)
         ignition6 = (QLabel*)ui->ignition6_value_label;
 
         ignitionChartView = (QChartView*)ui->ignition_chart_trace;
-        ignitionChartView->setChart(ignitionChart);
     }
 }
 
@@ -218,7 +214,7 @@ void MainWindow::openDevice()
     
     //QSerialPortInfo check_device(fileName);
 
-    ////if our device doesn't exist or it's not a valid file then we'll just wait for the user to give us another file
+    //if our device doesn't exist or it's not a valid file then we'll just wait for the user to give us another file
     //if(check_device.isNull() || check_device.isBusy())
     //{
         //readyToRead = false;
@@ -284,7 +280,14 @@ void MainWindow::readLineFromTrace()
         ignition5->setText(values[5]);
         ignition6->setText(values[6]);
 
+        drawGraph(values);
     }
+    else
+    {
+        runTimer->stop();
+        readyToRead = false;
+    }
+
 }
 
 void MainWindow::readLineFromDevice()
@@ -323,6 +326,7 @@ void MainWindow::readLineFromDevice()
     ignition5->setText(values[5]);
     ignition6->setText(values[6]);
 
+    drawGraph(values);
 }
 
 void MainWindow::stopRunning()
@@ -351,9 +355,94 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     changeTimerCalls(index);
 }
 
-void MainWindow::drawGraph()
+void MainWindow::drawGraph(QStringList values)
 {
     //http://www.advsofteng.com/doc/cdcppdoc/realtimedemoqt.htm
 
+    //extract all the values as integers and not strings
+    int interval = ((QString)values[0]).toInt();
+
+    int ignition1Value = ((QString)values[1]).toInt();
+    int ignition2Value = ((QString)values[2]).toInt();
+    int ignition3Value = ((QString)values[3]).toInt();
+    int ignition4Value = ((QString)values[4]).toInt();
+    int ignition5Value = ((QString)values[5]).toInt();
+    int ignition6Value = ((QString)values[6]).toInt();
+
+    //create the new chart with axes
+    QChart* newChart = new QChart();
+
+    //when the setup is done we can add all of our data to the chart
+    addIgnitionData(ignition1Data, ignition1Value, 1, interval);
+    addIgnitionData(ignition2Data, ignition2Value, 2, interval);
+    addIgnitionData(ignition3Data, ignition3Value, 3, interval);
+    addIgnitionData(ignition4Data, ignition4Value, 4, interval);
+    addIgnitionData(ignition5Data, ignition5Value, 5, interval);
+    addIgnitionData(ignition6Data, ignition6Value, 6, interval);
+
+    newChart->addSeries(ignition1Data);
+    newChart->addSeries(ignition2Data);
+    newChart->addSeries(ignition3Data);
+    newChart->addSeries(ignition4Data);
+    newChart->addSeries(ignition5Data);
+    newChart->addSeries(ignition6Data);
+
+    QCategoryAxis *axisX = new QCategoryAxis();
+    QCategoryAxis *axisY = new QCategoryAxis();
+
+    //we don't care about the legend because it's next to the axes anyway
+    newChart->legend()->hide();
+
+    //we want to make it so even if the ignition got off at the last moment we can still see the peak
+    axisX->setRange(0, interval * 1.1);
+    axisY->setRange(0, 7);
+
+    //put labels on the axes
+    axisY->append("Ignition 1", 1);
+    axisY->append("Ignition 2", 2);
+    axisY->append("Ignition 3", 3);
+    axisY->append("Ignition 4", 4);
+    axisY->append("Ignition 5", 5);
+    axisY->append("Ignition 6", 6);
+
+    axisY->setLabelsPosition(QCategoryAxis::AxisLabelsPosition::AxisLabelsPositionOnValue);
+
+    newChart->setAxisX(axisX);
+    newChart->setAxisY(axisY);
+
+    //ignition1Data->attachAxis(newChart->axisX());
+    ignition1Data->attachAxis(newChart->axisY());
+
+    //ignition2Data->attachAxis(newChart->axisX());
+    ignition2Data->attachAxis(newChart->axisY());
+
+    //ignition3Data->attachAxis(newChart->axisX());
+    ignition3Data->attachAxis(newChart->axisY());
+
+    //ignition4Data->attachAxis(newChart->axisX());
+    ignition4Data->attachAxis(newChart->axisY());
+
+    //ignition5Data->attachAxis(newChart->axisX());
+    ignition5Data->attachAxis(newChart->axisY());
+
+    //ignition6Data->attachAxis(newChart->axisX());
+    ignition6Data->attachAxis(newChart->axisY());
+
+    //and display it in our view
+    ignitionChartView->setChart(newChart);
+}
+
+void MainWindow::addIgnitionData(QLineSeries* series, int peak, int seriesNumber, int interval)
+{
+    float step = float(interval)/12;
+
+    series->clear();
+
+    series->append(0, seriesNumber);
+    series->append(peak, seriesNumber);
+    series->append(peak, seriesNumber + 0.3);
+    series->append(peak + step, seriesNumber + 0.3);
+    series->append(peak + step, seriesNumber);
+    series->append(interval, seriesNumber);
 }
 
