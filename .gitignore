@@ -4,3 +4,4 @@ qt_gui/main.o
 qt_gui/mainwindow.o
 qt_gui/moc_mainwindow.o
 qt_gui/qmake
+qt_gui/m2ems.pro.user

@@ -30,20 +30,10 @@
      <attribute name="title">
       <string>Exécution courante</string>
      </attribute>
-     <widget class="QtCharts::QChartView" name="ignition_chart_exec">
-      <property name="geometry">
-       <rect>
-        <x>470</x>
-        <y>0</y>
-        <width>581</width>
-        <height>441</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QWidget" name="verticalLayoutWidget_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>0</x>
         <y>10</y>
         <width>291</width>
         <height>94</height>
@@ -357,6 +347,49 @@
        </item>
       </layout>
      </widget>
+     <widget class="QTabWidget" name="chart_tabWidget_exec">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>0</y>
+        <width>721</width>
+        <height>571</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>Ignition chart</string>
+       </attribute>
+       <widget class="QtCharts::QChartView" name="ignition_chart_exec">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>691</width>
+          <height>521</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_7">
+       <attribute name="title">
+        <string>Engine RPM chart</string>
+       </attribute>
+       <widget class="QtCharts::QChartView" name="engine_chart_exec">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>691</width>
+          <height>521</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -365,7 +398,7 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>0</x>
         <y>10</y>
         <width>291</width>
         <height>80</height>
@@ -410,7 +443,7 @@
      <widget class="QWidget" name="verticalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>0</x>
         <y>100</y>
         <width>291</width>
         <height>122</height>
@@ -650,15 +683,48 @@
        </item>
       </layout>
      </widget>
-     <widget class="QtCharts::QChartView" name="ignition_chart_trace">
+     <widget class="QTabWidget" name="chart_tabWidget_trace">
       <property name="geometry">
        <rect>
         <x>410</x>
-        <y>20</y>
-        <width>681</width>
-        <height>501</height>
+        <y>0</y>
+        <width>721</width>
+        <height>571</height>
        </rect>
       </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Ignition chart</string>
+       </attribute>
+       <widget class="QtCharts::QChartView" name="ignition_chart_trace">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>691</width>
+          <height>521</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Engine RPM chart</string>
+       </attribute>
+       <widget class="QtCharts::QChartView" name="engine_chart_trace">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>691</width>
+          <height>521</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">

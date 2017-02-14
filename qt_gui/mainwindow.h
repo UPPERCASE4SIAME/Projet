@@ -84,6 +84,7 @@ private:
     QLineSeries* ignition6Data;
 
     QChartView* ignitionChartView;
+    QChartView* engineChartView;
 
     Ui::MainWindow *ui;
 

@@ -37,14 +37,19 @@ MainWindow::~MainWindow()
 
     delete runTimer;
 
+    delete ignition1Data;
+    delete ignition2Data;
+    delete ignition3Data;
+    delete ignition4Data;
+    delete ignition5Data;
+    delete ignition6Data;
+
     delete ignition1;
     delete ignition2;
     delete ignition3;
     delete ignition4;
     delete ignition5;
     delete ignition6;
-
-    delete browseEdit;
 
     delete ui;
 }
@@ -65,7 +70,8 @@ void MainWindow::initDisplays(int index)
         ignition5 = (QLabel*)ui->ignition5_value_label_exec;
         ignition6 = (QLabel*)ui->ignition6_value_label_exec;
 
-        ignitionChartView = (QChartView*)ui->ignition_chart_exec;
+        ignitionChartView   = (QChartView*)ui->ignition_chart_exec;
+        engineChartView     = (QChartView*)ui->engine_chart_exec;
     }
     else if (index == TRACE_MODE_INDEX)
     {
@@ -78,7 +84,8 @@ void MainWindow::initDisplays(int index)
         ignition5 = (QLabel*)ui->ignition5_value_label;
         ignition6 = (QLabel*)ui->ignition6_value_label;
 
-        ignitionChartView = (QChartView*)ui->ignition_chart_trace;
+        ignitionChartView   = (QChartView*)ui->ignition_chart_trace;
+        engineChartView     = (QChartView*)ui->engine_chart_exec;
     }
 }
 
@@ -162,7 +169,6 @@ void MainWindow::on_pause_button_clicked()
 
         paused = true;
     }
-
 }
 
 void MainWindow::on_browseEdit_editingFinished()
@@ -372,7 +378,7 @@ void MainWindow::drawGraph(QStringList values)
     //create the new chart with axes
     QChart* newChart = new QChart();
 
-    //when the setup is done we can add all of our data to the chart
+    //first we populate the data series with the rising edge values
     addIgnitionData(ignition1Data, ignition1Value, 1, interval);
     addIgnitionData(ignition2Data, ignition2Value, 2, interval);
     addIgnitionData(ignition3Data, ignition3Value, 3, interval);
@@ -380,6 +386,7 @@ void MainWindow::drawGraph(QStringList values)
     addIgnitionData(ignition5Data, ignition5Value, 5, interval);
     addIgnitionData(ignition6Data, ignition6Value, 6, interval);
 
+    //add them all to the chart
     newChart->addSeries(ignition1Data);
     newChart->addSeries(ignition2Data);
     newChart->addSeries(ignition3Data);
