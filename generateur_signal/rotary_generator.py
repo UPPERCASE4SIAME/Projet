@@ -3,7 +3,7 @@
 
 """
 Autors : UPPERCASES / STRE / M2 SIAME / University Paul Sabatier
-Projet : EmsBeanch
+Projet : EmsBeanch generateur de signal 
 """
 
 
