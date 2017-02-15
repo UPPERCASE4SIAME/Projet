@@ -24,12 +24,12 @@ class Rotary_generator(Thread):
 		
 	def __init__(self, rpm):
 		Thread.__init__(self)
-		self.__LATENCE = 5.0/rpm
 		GPIO.setmode(GPIO.BCM)
 		GPIO.setup(Rotary_generator.PRIMARY_RPM, GPIO.OUT)
 		GPIO.setup(Rotary_generator.SECONDARY_RPM, GPIO.OUT)
 		self.__keep_running = Event()
 		self.__keep_running.set()
+		self.update_RPM(rpm)
 		
 	def run (self):
 		compteur = 0
@@ -50,7 +50,7 @@ class Rotary_generator(Thread):
 			time.sleep(self.__LATENCE)
 	
 	def update_RPM(self, rpm):
-		self.__LATENCE = 5.0/rpm
+		self.__LATENCE = 1.7/rpm
 		print(self.__LATENCE)	
 	
 	def stop (self):
@@ -81,8 +81,8 @@ class Gamepad(Thread):
 		jt.init()
 		old_value = 0
 		while True:
-			
-			event = pygame.event.wait()
+			# Attente passive
+			event = pygame.event.wait() 
 			
 			if (event.type == pygame.JOYBUTTONDOWN) and (event.button == 9):
 				rotary.stop()
