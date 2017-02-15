@@ -14,13 +14,13 @@ import time
 import pygame
 from pygame import joystick
 
-MAX    = 10000  # RPM
-NORMAL = 1500
-MIN    = 200
+MAX    = 10000  # RPM 
+NORMAL = 500	
+MIN    = 50
 
 class Rotary_generator(Thread):
-	PRIMARY_RPM   = 23 #output rotary primary 24
-	SECONDARY_RPM = 24 #output rotary secondary 2
+	PRIMARY_RPM   = 23 #output rotary primary 24 on  GPIO 23
+	SECONDARY_RPM = 24 #output rotary secondary 2 on GPIO 24
 		
 	def __init__(self, rpm):
 		Thread.__init__(self)
@@ -30,22 +30,22 @@ class Rotary_generator(Thread):
 		self.__keep_running = Event()
 		self.__keep_running.set()
 		self.update_RPM(rpm)
+		self.__count = 0
 		
 	def run (self):
-		compteur = 0
 		while self.__keep_running.isSet():
-			if compteur % 2 != 0:
+			if self.__count % 2 != 0:
 				GPIO.output(Rotary_generator.PRIMARY_RPM, GPIO.HIGH)
 			else:
 				GPIO.output(Rotary_generator.PRIMARY_RPM, GPIO.LOW)
 
-			if compteur == 24/2:
+			if self.__count == 24/2:
 				GPIO.output(Rotary_generator.SECONDARY_RPM, GPIO.HIGH)
 			else:
 				GPIO.output(Rotary_generator.SECONDARY_RPM, GPIO.LOW)
 				
-			compteur = compteur + 1
-			compteur = compteur % 24
+			self.__count = self.__count + 1
+			self.__count = self.__count % 24
 
 			time.sleep(self.__LATENCE)
 	
