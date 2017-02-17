@@ -670,7 +670,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="engine_rpm_trace">
+          <widget class="QLabel" name="engine_rpm_value_trace">
            <property name="text">
             <string>0</string>
            </property>

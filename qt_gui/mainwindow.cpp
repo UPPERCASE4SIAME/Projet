@@ -283,7 +283,7 @@ void MainWindow::readLineFromTrace()
 
         currentRotationDuration = values[0].toFloat();
 
-        ui->engine_rpm_trace->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
+        ui->engine_rpm_value_trace->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
 
         for(int i = 0; i < NUM_CYLINDERS; i++)
         {
@@ -338,7 +338,7 @@ void MainWindow::readLineFromDevice()
 
     currentRotationDuration = values[0].toFloat();
 
-    ui->engine_rpm_exec->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
+    ui->engine_rpm_value_exec->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
 
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
