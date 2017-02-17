@@ -82,7 +82,7 @@ void MainWindow::initDisplays(int index)
         ignitionChartView   = (QChartView*)ui->ignition_chart_exec;
         engineChartView     = (QChartView*)ui->engine_chart_exec;
 
-//        setupIgnitionChart(ignitionChart_exec);
+        setupIgnitionChart(ignitionChart_exec);
     }
     else if (index == TRACE_MODE_INDEX)
     {
@@ -98,7 +98,7 @@ void MainWindow::initDisplays(int index)
         ignitionChartView   = (QChartView*)ui->ignition_chart_trace;
         engineChartView     = (QChartView*)ui->engine_chart_trace;
 
-//        setupIgnitionChart(ignitionChart_trace);
+        setupIgnitionChart(ignitionChart_trace);
     }
 }
 
@@ -143,7 +143,8 @@ void MainWindow::startRunning(float delay)
 
 void MainWindow::on_rotation_freq_counter_valueChanged(double newValue)
 {
-    stepDelay = newValue;
+    //step delay is in engine cycles and not in rps
+    stepDelay = newValue/2;
 }
 
 void MainWindow::on_execution_button_clicked()
@@ -276,6 +277,8 @@ void MainWindow::readLineFromTrace()
 
         currentRotationDuration = values[0].toInt();
 
+        ui->engine_rpm_trace->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
+
         for(int i = 0; i < NUM_CYLINDERS; i++)
         {
             ignitionLabels[i]->setText(values[i+1]);
@@ -289,7 +292,8 @@ void MainWindow::readLineFromTrace()
     }
     else
     {
-        runTimer->stop();
+        stopRunning();
+
         readyToRead = false;
     }
 
@@ -304,6 +308,7 @@ void MainWindow::readLineFromDevice()
 
 
     data = device->readLine();
+    device->readAll();
 
     //transforms the byte array into a string
     QString line(data);
@@ -322,6 +327,10 @@ void MainWindow::readLineFromDevice()
 
     values = line.split(";");
 
+    currentRotationDuration = values[0].toFloat();
+
+    ui->engine_rpm_exec->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
+
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
         ignitionLabels[i]->setText(values[i+1]);
@@ -333,6 +342,11 @@ void MainWindow::readLineFromDevice()
 void MainWindow::stopRunning()
 {
     runTimer->stop();
+
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        engineDisplayTimers[i]->stop();
+    }
 }
 
 void MainWindow::on_browseEdit_save_exec_editingFinished()
@@ -352,8 +366,11 @@ void MainWindow::on_save_button_exec_clicked()
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
+    stopRunning();
+
     initDisplays(index);
     changeTimerCalls(index);
+
 }
 
 void MainWindow::setupIgnitionChart(QChart* chart)
@@ -366,6 +383,8 @@ void MainWindow::setupIgnitionChart(QChart* chart)
     //it's easier than inserting them on the spot and faster
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
+        ignitionData[i]->clear();
+
         ignitionData[i]->append(0, i + 1);
         ignitionData[i]->append(i * 2 + 1, i + 1);
         ignitionData[i]->append(i * 2 + 1, i + 1.3);
