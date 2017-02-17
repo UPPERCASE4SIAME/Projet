@@ -17,6 +17,7 @@
 #include <QGraphicsScene>
 #include <QPixmap>
 #include <QPainter>
+#include <QGraphicsScene>
 #include <QImage>
 #include <QGraphicsPixmapItem>
 

@@ -26,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initDisplays(curr_index);
     changeTimerCalls(curr_index);
-
     setupEngineCycleDisplay();
 
     setupIgnitionChart(ignitionChart_exec);
@@ -45,8 +44,6 @@ MainWindow::~MainWindow()
         delete ignitionData[i];
     }
 
-
-    delete browseEdit;
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
         delete ignitionLabels[i];
@@ -60,11 +57,11 @@ MainWindow::~MainWindow()
         }
     }
 
+    delete ui;
+
     delete ignitionChart_exec;
     delete ignitionChart_trace;
     delete engineCycleScene;
-
-    delete ui;
 }
 
 void MainWindow::initDisplays(int index)
