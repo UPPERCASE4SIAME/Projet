@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     runTimer = new QTimer(this);
 
-    stepDelay = 1;
+    stepDelay = 0.5;
     execution_counter = 0;
 
     for(int i = 0; i < NUM_CYLINDERS; i++)
@@ -145,6 +145,8 @@ void MainWindow::on_rotation_freq_counter_valueChanged(double newValue)
 {
     //step delay is in engine cycles and not in rps
     stepDelay = newValue/2;
+
+    startRunning(1000/stepDelay);
 }
 
 void MainWindow::on_execution_button_clicked()
@@ -226,6 +228,8 @@ void MainWindow::openTrace()
 
     readyToRead = true;
 
+    stopRunning();
+
     traceFileIn = new QTextStream(traceFile);
 }
 
@@ -261,6 +265,8 @@ void MainWindow::readLineFromTrace()
     {
         line = traceFileIn->readLine();
 
+        qDebug() << "reading line";
+
         if(line.isEmpty())
         {
             return;
@@ -275,7 +281,7 @@ void MainWindow::readLineFromTrace()
 
         values = line.split(";");
 
-        currentRotationDuration = values[0].toInt();
+        currentRotationDuration = values[0].toFloat();
 
         ui->engine_rpm_trace->setText(QString::number((int)(60/(currentRotationDuration/2000000))));
 
@@ -283,8 +289,11 @@ void MainWindow::readLineFromTrace()
         {
             ignitionLabels[i]->setText(values[i+1]);
 
-            //???
-            QTimer::singleShot(1000.0 / stepDelay * (values[i+1].toFloat() / values[0].toFloat()) , this, SLOT(drawCycle()));
+            //this calls the function that starts the animation for this ignition
+            //after a time proportional to when the ignition happened during the engine cycle
+            QTimer::singleShot(1000.0 / stepDelay * (values[i+1].toFloat() / currentRotationDuration) , Qt::TimerType::PreciseTimer, this, SLOT(drawCycle()));
+
+            qDebug() << (values[i+1].toFloat() / currentRotationDuration);
         }
 
 
@@ -347,6 +356,13 @@ void MainWindow::stopRunning()
     {
         engineDisplayTimers[i]->stop();
     }
+
+    QThread::sleep(0.1);
+
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        engineDisplayTimers[i]->stop();
+    }
 }
 
 void MainWindow::on_browseEdit_save_exec_editingFinished()
@@ -386,10 +402,10 @@ void MainWindow::setupIgnitionChart(QChart* chart)
         ignitionData[i]->clear();
 
         ignitionData[i]->append(0, i + 1);
-        ignitionData[i]->append(i * 2 + 1, i + 1);
-        ignitionData[i]->append(i * 2 + 1, i + 1.3);
-        ignitionData[i]->append(i * 2 + 2, i + 1.3);
-        ignitionData[i]->append(i * 2 + 2, i + 1);
+        ignitionData[i]->append(1, i + 1);
+        ignitionData[i]->append(2, i + 1);
+        ignitionData[i]->append(3, i + 1);
+        ignitionData[i]->append(4, i + 1);
         ignitionData[i]->append(25, i + 1);
 
         chart->addSeries(ignitionData[i]);
@@ -453,19 +469,23 @@ void MainWindow::setupEngineCycleDisplay()
                                      "haut_adm.jpg","milieu_adm.jpg","bas_adm.jpg",
                                      "bas_comp.jpg","milieu_comp.jpg","haut_comp.jpg"};
 
+    //setting up the gui
     QSize sceneSize = ui->engineCycle_display->size();
 
-    sceneWidth = sceneSize.width() * 0.9;
+    //ugly fix to remove the scrollbars qt puts in if you give the exact width and height
+    int sceneWidth = sceneSize.width() * 0.9;
     int sceneHeight = sceneSize.height() * 0.9;
 
     engineCycleScene = new QGraphicsScene(0, 0, sceneWidth, sceneHeight);
     ui->engineCycle_display->setScene(engineCycleScene);
     ui->engineCycle_display->show();
 
+    //each cylinder has a 12 frames animation
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
         for(int j = 0; j < NUM_ENGINE_ANIMATION_IMAGES; j++)
         {
+            //we load the image, rescale it and it to the graphics scene at the position where it's going to be displayed
             QImage image(IMAGE_DIRECTORY + imageNames[j]);
 
             QImage scaledImage = image.scaled(sceneWidth/NUM_CYLINDERS, sceneHeight);
@@ -474,15 +494,12 @@ void MainWindow::setupEngineCycleDisplay()
             engineCycleScene->addItem(cycle[i][j]);
 
             cycle[i][j]->setPos(i * sceneWidth / NUM_CYLINDERS, 0);
-
-           // cycle[i][j]->hide();
         }
     }
 
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
         engineDisplayTimers[i] = new QBasicTimer();
-//        engineDisplayTimers[i]->connect(engineDisplayTimers[i], SIGNAL(&MainWindow::engineDisplayNextStateSignal(i)), this, SLOT(MainWindow::nextState(i)));
     }
 }
 
@@ -493,30 +510,32 @@ void MainWindow::setupEngineCycleDisplay()
 void MainWindow::drawCycle()
 {
     //1 5 3 6 2 4
-    static int currentCylinder[6] = {0,4,2,5,1,3};
+    static int firingOrder[NUM_CYLINDERS] = {0,4,2,5,1,3};
     static int currentCylinderNum = 0;
 
-    float rotationDurationMs = currentRotationDuration / 1000;
+    int activeCylinder = firingOrder[currentCylinderNum];
 
-//    while(engineDisplayAvailableToDraw[currentCylinder] == 0)
-//    {
-//        //that's super dirty but I don't really know what to do there because of timer limitations
-//        QThread::sleep(1/10000000);
-//    }
+//    float rotationDurationMs = currentRotationDuration / 1000;
 
-    engineDisplayAvailableToDraw[currentCylinder[currentCylinderNum]] = 0;
-    engineDisplayTimers[currentCylinder[currentCylinderNum]]->start((1000.0/stepDelay/12), this);
+//    engineDisplayAvailableToDraw[activeCylinder] = 0;
 
-    currentCylinder[currentCylinderNum] = (currentCylinder[currentCylinderNum] + 1) % NUM_CYLINDERS;
+    engineDisplayTimers[activeCylinder]->start((1000.0/stepDelay/6), Qt::TimerType::PreciseTimer, this);
+    nextState(activeCylinder);
+
+    currentCylinderNum = (currentCylinderNum + 1) % NUM_CYLINDERS;
 }
 
 void MainWindow::timerEvent(QTimerEvent *event)
 {
+    if(event->timerId() == runTimer->timerId())
+    {
+        readLineFromTrace();
+    }
+
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
         if(event->timerId() == engineDisplayTimers[i]->timerId())
         {
-            //qDebug() << "timer event " + i;
             nextState(i);
             return;
         }
@@ -539,11 +558,11 @@ void MainWindow::nextState(int ignition)
 
     cycle[ignition][cycle_number[ignition]]->setZValue(1);
 
-    //if we've done a full cycle we stop
-    if(cycle_number[ignition] == 0)
-    {
-//        engineDisplayTimers[ignition]->stop();
-        engineDisplayAvailableToDraw[ignition] = 1;
-    }
+//    //if we've done a full cycle we stop
+//    if(cycle_number[ignition] == 0)
+//    {
+//        //engineDisplayTimers[ignition]->stop();
+//        engineDisplayAvailableToDraw[ignition] = 1;
+//    }
 }
 

@@ -106,8 +106,6 @@ private:
     QGraphicsScene* engineCycleScene;
     QBasicTimer* engineDisplayTimers[NUM_CYLINDERS];
     int engineDisplayAvailableToDraw[NUM_CYLINDERS];
-    int sceneWidth;
-
 
     Ui::MainWindow *ui;
 
