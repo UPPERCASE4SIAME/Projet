@@ -13,6 +13,17 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QtCharts>
 #include <QTextCodec>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QPixmap>
+#include <QPainter>
+#include <QGraphicsScene>
+#include <QImage>
+#include <QGraphicsPixmapItem>
+
+#define NUM_CYLINDERS 6
+#define NUM_ENGINE_ANIMATION_IMAGES 12
+#define IMAGE_DIRECTORY "./img/"
 
 namespace Ui {
 class MainWindow;
@@ -26,10 +37,18 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+
+    void engineDisplayNextStateSignal(int ignition);
+    void engineDisplayDrawCycleSignal(int ignitionNum, int rotationDuration);
+
+protected:
+    void timerEvent(QTimerEvent *event) override;
+
 private slots:
     void on_browse_button_clicked();
 
-    void on_rotation_freq_counter_valueChanged(int newValue);
+    void on_rotation_freq_counter_valueChanged(double newValue);
 
     void on_execution_button_clicked();
 
@@ -55,6 +74,9 @@ private slots:
 
     void on_readDevice_button_clicked();
 
+
+    void drawCycle();
+
 private:
 
     bool readyToRead = false;    
@@ -64,27 +86,28 @@ private:
 
     QTimer *runTimer;
 
-    int stepDelay;
+    float stepDelay;
     int execution_counter;
+    float currentRotationDuration;
 
     QLineEdit* browseEdit;
 
-    QLabel* ignition1;
-    QLabel* ignition2;
-    QLabel* ignition3;
-    QLabel* ignition4;
-    QLabel* ignition5;
-    QLabel* ignition6;
+    QLabel* ignitionLabels[NUM_CYLINDERS];
 
-    QLineSeries* ignition1Data;
-    QLineSeries* ignition2Data;
-    QLineSeries* ignition3Data;
-    QLineSeries* ignition4Data;
-    QLineSeries* ignition5Data;
-    QLineSeries* ignition6Data;
+    QLineSeries* ignitionData[NUM_CYLINDERS];
+
+    QChart* ignitionChart_trace;
+    QChart* ignitionChart_exec;
 
     QChartView* ignitionChartView;
     QChartView* engineChartView;
+
+    QGraphicsPixmapItem* cycle[NUM_CYLINDERS][NUM_ENGINE_ANIMATION_IMAGES];
+    QGraphicsScene* engineCycleScene;
+    QBasicTimer* engineDisplayTimers[NUM_CYLINDERS];
+    int engineDisplayAvailableToDraw[NUM_CYLINDERS];
+    int sceneWidth;
+
 
     Ui::MainWindow *ui;
 
@@ -94,8 +117,10 @@ private:
     void startRunning(float delay);
     void openDevice();
     void changeTimerCalls(int index);
-    void drawGraph(QStringList values);
-    void addIgnitionData(QLineSeries *series, int peak, int seriesNumber, int interval);
+    void setupIgnitionChart(QChart* chart);
+    void changeIgnition(QStringList values);
+    void setupEngineCycleDisplay();
+    void nextState(int ignition);
 };
 
 #endif // MAINWINDOW_H

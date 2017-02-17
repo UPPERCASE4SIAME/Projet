@@ -14,12 +14,10 @@ MainWindow::MainWindow(QWidget *parent) :
     stepDelay = 1;
     execution_counter = 0;
 
-    ignition1Data = new QLineSeries();
-    ignition2Data = new QLineSeries();
-    ignition3Data = new QLineSeries();
-    ignition4Data = new QLineSeries();
-    ignition5Data = new QLineSeries();
-    ignition6Data = new QLineSeries();
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        ignitionData[i] = new QLineSeries();
+    }
 
     ui->setupUi(this);
 
@@ -27,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initDisplays(curr_index);
     changeTimerCalls(curr_index);
+    setupEngineCycleDisplay();
 }
 
 MainWindow::~MainWindow()
@@ -37,55 +36,66 @@ MainWindow::~MainWindow()
 
     delete runTimer;
 
-    delete ignition1Data;
-    delete ignition2Data;
-    delete ignition3Data;
-    delete ignition4Data;
-    delete ignition5Data;
-    delete ignition6Data;
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        delete ignitionData[i];
+    }
 
-    delete ignition1;
-    delete ignition2;
-    delete ignition3;
-    delete ignition4;
-    delete ignition5;
-    delete ignition6;
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        delete ignitionLabels[i];
+    }
+
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        for(int j = 0; j < NUM_ENGINE_ANIMATION_IMAGES; j++)
+        {
+            delete cycle[i][j];
+        }
+    }
 
     delete ui;
+
+    delete ignitionChart_exec;
+    delete ignitionChart_trace;
+    delete engineCycleScene;
 }
 
 void MainWindow::initDisplays(int index)
 {
     /* depending on which tab we are on, our line reading function is going to write to different labels
-       our file will also be different
-        those names can be changed in the form editor */
+       our file will also be different those names can be changed in the form editor */
     if(index == EXEC_MODE_INDEX)
     {
         browseEdit = (QLineEdit*)ui->browseEdit_exec;
 
-        ignition1 = (QLabel*)ui->ignition1_value_label_exec;
-        ignition2 = (QLabel*)ui->ignition2_value_label_exec;
-        ignition3 = (QLabel*)ui->ignition3_value_label_exec;
-        ignition4 = (QLabel*)ui->ignition4_value_label_exec;
-        ignition5 = (QLabel*)ui->ignition5_value_label_exec;
-        ignition6 = (QLabel*)ui->ignition6_value_label_exec;
+        ignitionLabels[0] = (QLabel*)ui->ignition1_value_label_exec;
+        ignitionLabels[1] = (QLabel*)ui->ignition2_value_label_exec;
+        ignitionLabels[2] = (QLabel*)ui->ignition3_value_label_exec;
+        ignitionLabels[3] = (QLabel*)ui->ignition4_value_label_exec;
+        ignitionLabels[4] = (QLabel*)ui->ignition5_value_label_exec;
+        ignitionLabels[5] = (QLabel*)ui->ignition6_value_label_exec;
 
         ignitionChartView   = (QChartView*)ui->ignition_chart_exec;
         engineChartView     = (QChartView*)ui->engine_chart_exec;
+
+        setupIgnitionChart(ignitionChart_exec);
     }
     else if (index == TRACE_MODE_INDEX)
     {
         browseEdit = (QLineEdit*)ui->browseEdit;
 
-        ignition1 = (QLabel*)ui->ignition1_value_label;
-        ignition2 = (QLabel*)ui->ignition2_value_label;
-        ignition3 = (QLabel*)ui->ignition3_value_label;
-        ignition4 = (QLabel*)ui->ignition4_value_label;
-        ignition5 = (QLabel*)ui->ignition5_value_label;
-        ignition6 = (QLabel*)ui->ignition6_value_label;
+        ignitionLabels[0] = (QLabel*)ui->ignition1_value_label;
+        ignitionLabels[1] = (QLabel*)ui->ignition2_value_label;
+        ignitionLabels[2] = (QLabel*)ui->ignition3_value_label;
+        ignitionLabels[3] = (QLabel*)ui->ignition4_value_label;
+        ignitionLabels[4] = (QLabel*)ui->ignition5_value_label;
+        ignitionLabels[5] = (QLabel*)ui->ignition6_value_label;
 
         ignitionChartView   = (QChartView*)ui->ignition_chart_trace;
-        engineChartView     = (QChartView*)ui->engine_chart_exec;
+        engineChartView     = (QChartView*)ui->engine_chart_trace;
+
+        setupIgnitionChart(ignitionChart_trace);
     }
 }
 
@@ -128,7 +138,7 @@ void MainWindow::startRunning(float delay)
     runTimer->start(delay);
 }
 
-void MainWindow::on_rotation_freq_counter_valueChanged(int newValue)
+void MainWindow::on_rotation_freq_counter_valueChanged(double newValue)
 {
     stepDelay = newValue;
 }
@@ -142,6 +152,7 @@ void MainWindow::on_execution_button_clicked()
 
     if(readyToRead)
     {
+        ((QPushButton*)ui->pause_button)->setText("Pause");
         startRunning(1000/stepDelay);
     }
 }
@@ -217,27 +228,10 @@ void MainWindow::openTrace()
 void MainWindow::openDevice()
 {
     QString fileName = browseEdit->text();
-    
-    //QSerialPortInfo check_device(fileName);
-
-    //if our device doesn't exist or it's not a valid file then we'll just wait for the user to give us another file
-    //if(check_device.isNull() || check_device.isBusy())
-    //{
-        //readyToRead = false;
-
-        //qDebug() << "device doesn't exist or is unreadable";
-        //return;
-    //}
-
 
     device = new QSerialPort(this);
-    
-    qDebug() << "blah";
-    
-    device->setPortName(fileName);
-    
-    qDebug() << "meh";
-    
+        
+    device->setPortName(fileName);    
 
     if (!device->open(QIODevice::ReadWrite))
     {
@@ -248,9 +242,7 @@ void MainWindow::openDevice()
     }
 
     readyToRead = true;
-    
-    qDebug() << "device opened";
-    
+        
     connect(device, &QSerialPort::readyRead, this, &MainWindow::readLineFromDevice);
 }
 
@@ -279,14 +271,18 @@ void MainWindow::readLineFromTrace()
 
         values = line.split(";");
 
-        ignition1->setText(values[1]);
-        ignition2->setText(values[2]);
-        ignition3->setText(values[3]);
-        ignition4->setText(values[4]);
-        ignition5->setText(values[5]);
-        ignition6->setText(values[6]);
+        currentRotationDuration = values[0].toInt();
 
-        drawGraph(values);
+        for(int i = 0; i < NUM_CYLINDERS; i++)
+        {
+            ignitionLabels[i]->setText(values[i+1]);
+
+            //???
+            QTimer::singleShot(1000.0 / stepDelay * (values[i+1].toFloat() / values[0].toFloat()) , this, SLOT(drawCycle()));
+        }
+
+
+        changeIgnition(values);
     }
     else
     {
@@ -308,9 +304,7 @@ void MainWindow::readLineFromDevice()
 
     //transforms the byte array into a string
     QString line(data);
-    
-    qDebug() << line;
-    
+        
     if(line.isEmpty())
     {
         return;
@@ -325,14 +319,12 @@ void MainWindow::readLineFromDevice()
 
     values = line.split(";");
 
-    ignition1->setText(values[1]);
-    ignition2->setText(values[2]);
-    ignition3->setText(values[3]);
-    ignition4->setText(values[4]);
-    ignition5->setText(values[5]);
-    ignition6->setText(values[6]);
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        ignitionLabels[i]->setText(values[i+1]);
+    }
 
-    drawGraph(values);
+    changeIgnition(values);
 }
 
 void MainWindow::stopRunning()
@@ -361,47 +353,34 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     changeTimerCalls(index);
 }
 
-void MainWindow::drawGraph(QStringList values)
+void MainWindow::setupIgnitionChart(QChart* chart)
 {
-    //http://www.advsofteng.com/doc/cdcppdoc/realtimedemoqt.htm
+    //make a new chart that we're going to add to the view
+    chart = new QChart();
 
-    //extract all the values as integers and not strings
-    int interval = ((QString)values[0]).toInt();
+    //we feed initial data to each series, we have those 4 dummy points in the middle
+    //because we replace them later with updated values and that calls for a repaint
+    //it's easier than inserting them on the spot and faster
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        ignitionData[i]->append(0, i + 1);
+        ignitionData[i]->append(i * 2 + 1, i + 1);
+        ignitionData[i]->append(i * 2 + 1, i + 1.3);
+        ignitionData[i]->append(i * 2 + 2, i + 1.3);
+        ignitionData[i]->append(i * 2 + 2, i + 1);
+        ignitionData[i]->append(25, i + 1);
 
-    int ignition1Value = ((QString)values[1]).toInt();
-    int ignition2Value = ((QString)values[2]).toInt();
-    int ignition3Value = ((QString)values[3]).toInt();
-    int ignition4Value = ((QString)values[4]).toInt();
-    int ignition5Value = ((QString)values[5]).toInt();
-    int ignition6Value = ((QString)values[6]).toInt();
-
-    //create the new chart with axes
-    QChart* newChart = new QChart();
-
-    //first we populate the data series with the rising edge values
-    addIgnitionData(ignition1Data, ignition1Value, 1, interval);
-    addIgnitionData(ignition2Data, ignition2Value, 2, interval);
-    addIgnitionData(ignition3Data, ignition3Value, 3, interval);
-    addIgnitionData(ignition4Data, ignition4Value, 4, interval);
-    addIgnitionData(ignition5Data, ignition5Value, 5, interval);
-    addIgnitionData(ignition6Data, ignition6Value, 6, interval);
-
-    //add them all to the chart
-    newChart->addSeries(ignition1Data);
-    newChart->addSeries(ignition2Data);
-    newChart->addSeries(ignition3Data);
-    newChart->addSeries(ignition4Data);
-    newChart->addSeries(ignition5Data);
-    newChart->addSeries(ignition6Data);
+        chart->addSeries(ignitionData[i]);
+    }
 
     QCategoryAxis *axisX = new QCategoryAxis();
     QCategoryAxis *axisY = new QCategoryAxis();
 
     //we don't care about the legend because it's next to the axes anyway
-    newChart->legend()->hide();
+    chart->legend()->hide();
 
     //we want to make it so even if the ignition got off at the last moment we can still see the peak
-    axisX->setRange(0, interval * 1.1);
+    axisX->setRange(0, 25);
     axisY->setRange(0, 7);
 
     //put labels on the axes
@@ -414,42 +393,135 @@ void MainWindow::drawGraph(QStringList values)
 
     axisY->setLabelsPosition(QCategoryAxis::AxisLabelsPosition::AxisLabelsPositionOnValue);
 
-    newChart->setAxisX(axisX);
-    newChart->setAxisY(axisY);
+    chart->setAxisX(axisX);
+    chart->setAxisY(axisY);
 
-    //ignition1Data->attachAxis(newChart->axisX());
-    ignition1Data->attachAxis(newChart->axisY());
-
-    //ignition2Data->attachAxis(newChart->axisX());
-    ignition2Data->attachAxis(newChart->axisY());
-
-    //ignition3Data->attachAxis(newChart->axisX());
-    ignition3Data->attachAxis(newChart->axisY());
-
-    //ignition4Data->attachAxis(newChart->axisX());
-    ignition4Data->attachAxis(newChart->axisY());
-
-    //ignition5Data->attachAxis(newChart->axisX());
-    ignition5Data->attachAxis(newChart->axisY());
-
-    //ignition6Data->attachAxis(newChart->axisX());
-    ignition6Data->attachAxis(newChart->axisY());
+    //we need to attach the data series to the axes so it scales correctly
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        ignitionData[i]->attachAxis(chart->axisY());
+    }
 
     //and display it in our view
-    ignitionChartView->setChart(newChart);
+    ignitionChartView->setChart(chart);
 }
 
-void MainWindow::addIgnitionData(QLineSeries* series, int peak, int seriesNumber, int interval)
+void MainWindow::changeIgnition(QStringList values)
 {
-    float step = float(interval)/12;
+    float ignitionValues[NUM_CYLINDERS];
 
-    series->clear();
+    //we need this to position the ignition correctly
+    float interval = ((QString)values[0]).toFloat();
 
-    series->append(0, seriesNumber);
-    series->append(peak, seriesNumber);
-    series->append(peak, seriesNumber + 0.3);
-    series->append(peak + step, seriesNumber + 0.3);
-    series->append(peak + step, seriesNumber);
-    series->append(interval, seriesNumber);
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        ignitionValues[i] = ((QString)values[i + 1]).toFloat() / interval * 24;
+
+        ignitionData[i]->replace(1, ignitionValues[i], i + 1);
+        ignitionData[i]->replace(2, ignitionValues[i], i + 1.3);
+        ignitionData[i]->replace(3, ignitionValues[i] + 1, i + 1.3);
+        ignitionData[i]->replace(4, ignitionValues[i] + 1, i + 1);
+    }
+}
+
+void MainWindow::setupEngineCycleDisplay()
+{
+    static QString imageNames[NUM_ENGINE_ANIMATION_IMAGES] = {"haut_det.jpg","milieu_det.jpg","bas_det.jpg",
+                                     "bas_ech.jpg","milieu_ech.jpg","haut_ech.jpg",
+                                     "haut_adm.jpg","milieu_adm.jpg","bas_adm.jpg",
+                                     "bas_comp.jpg","milieu_comp.jpg","haut_comp.jpg"};
+
+    QSize sceneSize = ui->engineCycle_display->size();
+
+    sceneWidth = sceneSize.width() * 0.9;
+    int sceneHeight = sceneSize.height() * 0.9;
+
+    engineCycleScene = new QGraphicsScene(0, 0, sceneWidth, sceneHeight);
+    ui->engineCycle_display->setScene(engineCycleScene);
+    ui->engineCycle_display->show();
+
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        for(int j = 0; j < NUM_ENGINE_ANIMATION_IMAGES; j++)
+        {
+            QImage image(IMAGE_DIRECTORY + imageNames[j]);
+
+            QImage scaledImage = image.scaled(sceneWidth/NUM_CYLINDERS, sceneHeight);
+
+            cycle[i][j] = new QGraphicsPixmapItem(QPixmap::fromImage(scaledImage));
+            engineCycleScene->addItem(cycle[i][j]);
+
+            cycle[i][j]->setPos(i * sceneWidth / NUM_CYLINDERS, 0);
+
+           // cycle[i][j]->hide();
+        }
+    }
+
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        engineDisplayTimers[i] = new QBasicTimer();
+//        engineDisplayTimers[i]->connect(engineDisplayTimers[i], SIGNAL(&MainWindow::engineDisplayNextStateSignal(i)), this, SLOT(MainWindow::nextState(i)));
+    }
+}
+
+
+/* When called, initiates the animation for the cylinder ignitionNum
+ * If a timer is already running, we'll wait for the end of the animation
+ */
+void MainWindow::drawCycle()
+{
+    //1 5 3 6 2 4
+    static int currentCylinder[6] = {0,4,2,5,1,3};
+    static int currentCylinderNum = 0;
+
+    float rotationDurationMs = currentRotationDuration / 1000;
+
+//    while(engineDisplayAvailableToDraw[currentCylinder] == 0)
+//    {
+//        //that's super dirty but I don't really know what to do there because of timer limitations
+//        QThread::sleep(1/10000000);
+//    }
+
+    engineDisplayAvailableToDraw[currentCylinder[currentCylinderNum]] = 0;
+    engineDisplayTimers[currentCylinder[currentCylinderNum]]->start((1000.0/stepDelay/12), this);
+
+    currentCylinder[currentCylinderNum] = (currentCylinder[currentCylinderNum] + 1) % NUM_CYLINDERS;
+}
+
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    for(int i = 0; i < NUM_CYLINDERS; i++)
+    {
+        if(event->timerId() == engineDisplayTimers[i]->timerId())
+        {
+            //qDebug() << "timer event " + i;
+            nextState(i);
+            return;
+        }
+    }
+}
+
+/* This function is called regularly to update the state of each cylinder
+ * it sets the image corresponding to the state the cylinder given as an argument
+ * as visible and puts that image where the cylinder is in the graphical scene
+ */
+void MainWindow::nextState(int ignition)
+{
+    static int cycle_number[NUM_CYLINDERS] = {0, 0, 0, 0, 0, 0};
+
+    //qDebug() << ignition << cycle_number[ignition];
+
+    cycle[ignition][cycle_number[ignition]]->setZValue(0);
+
+    cycle_number[ignition] = (cycle_number[ignition] + 1) % NUM_ENGINE_ANIMATION_IMAGES;
+
+    cycle[ignition][cycle_number[ignition]]->setZValue(1);
+
+    //if we've done a full cycle we stop
+    if(cycle_number[ignition] == 0)
+    {
+//        engineDisplayTimers[ignition]->stop();
+        engineDisplayAvailableToDraw[ignition] = 1;
+    }
 }
 
