@@ -23,9 +23,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	int curr_index = ui->tabWidget->currentIndex();
 
+
     initDisplays(curr_index);
     changeTimerCalls(curr_index);
     setupEngineCycleDisplay();
+
+    setupIgnitionChart(ignitionChart_exec);
 }
 
 MainWindow::~MainWindow()
@@ -79,7 +82,7 @@ void MainWindow::initDisplays(int index)
         ignitionChartView   = (QChartView*)ui->ignition_chart_exec;
         engineChartView     = (QChartView*)ui->engine_chart_exec;
 
-        setupIgnitionChart(ignitionChart_exec);
+//        setupIgnitionChart(ignitionChart_exec);
     }
     else if (index == TRACE_MODE_INDEX)
     {
@@ -95,7 +98,7 @@ void MainWindow::initDisplays(int index)
         ignitionChartView   = (QChartView*)ui->ignition_chart_trace;
         engineChartView     = (QChartView*)ui->engine_chart_trace;
 
-        setupIgnitionChart(ignitionChart_trace);
+//        setupIgnitionChart(ignitionChart_trace);
     }
 }
 
