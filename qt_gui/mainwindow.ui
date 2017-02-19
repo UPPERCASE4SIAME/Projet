@@ -55,7 +55,7 @@
        <item>
         <widget class="QLabel" name="label_53">
          <property name="text">
-          <string>Device de la trace</string>
+          <string>Device</string>
          </property>
         </widget>
        </item>
@@ -71,7 +71,7 @@
          <item>
           <widget class="QPushButton" name="browse_button_exec">
            <property name="text">
-            <string>Parcourir</string>
+            <string>Browse</string>
            </property>
           </widget>
          </item>
@@ -82,7 +82,7 @@
          <item>
           <widget class="QPushButton" name="readDevice_button">
            <property name="text">
-            <string>Lire</string>
+            <string>Read</string>
            </property>
           </widget>
          </item>
@@ -121,9 +121,9 @@
        <item row="0" column="1">
         <layout class="QHBoxLayout" name="ignition4_layout_2">
          <item>
-          <widget class="QLabel" name="ignition4_title_label_exec">
+          <widget class="QLabel" name="ignition6_title_label_exec">
            <property name="text">
-            <string>Bougie 4</string>
+            <string>Ignition 4</string>
            </property>
           </widget>
          </item>
@@ -144,7 +144,7 @@
          <item>
           <widget class="QLabel" name="ignition3_title_label_exec">
            <property name="text">
-            <string>Bougie 3</string>
+            <string>Ignition 3</string>
            </property>
           </widget>
          </item>
@@ -163,9 +163,9 @@
        <item row="2" column="1">
         <layout class="QHBoxLayout" name="ignition6_layout_2">
          <item>
-          <widget class="QLabel" name="ignition6_title_label_exec">
+          <widget class="QLabel" name="ignition4_title_label_exec">
            <property name="text">
-            <string>Bougie 6</string>
+            <string>Ignition 6</string>
            </property>
           </widget>
          </item>
@@ -184,9 +184,9 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="ignition2_layout_2">
          <item>
-          <widget class="QLabel" name="ignition2_title_label_exec">
+          <widget class="QLabel" name="ignition5_title_label_exec">
            <property name="text">
-            <string>Bougie 2</string>
+            <string>Ignition 2</string>
            </property>
           </widget>
          </item>
@@ -205,9 +205,9 @@
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="ignition5_layout_2">
          <item>
-          <widget class="QLabel" name="ignition5_title_label_exec">
+          <widget class="QLabel" name="ignition2_title_label_exec">
            <property name="text">
-            <string>Bougie 5</string>
+            <string>Ignition 5</string>
            </property>
           </widget>
          </item>
@@ -228,7 +228,7 @@
          <item>
           <widget class="QLabel" name="ignition1_title_label_exec">
            <property name="text">
-            <string>Bougie 1</string>
+            <string>Ignition 1</string>
            </property>
           </widget>
          </item>
@@ -249,7 +249,7 @@
          <item>
           <widget class="QLabel" name="engine_rpm_exec">
            <property name="text">
-            <string>rpm moteur</string>
+            <string>Engine RPM</string>
            </property>
           </widget>
          </item>
@@ -308,7 +308,7 @@
            <item>
             <widget class="QLabel" name="label_54">
              <property name="text">
-              <string>Fichier d'enregistrement de la trace</string>
+              <string>Trace recording file</string>
              </property>
             </widget>
            </item>
@@ -324,7 +324,7 @@
              <item>
               <widget class="QPushButton" name="browse_button_save_exec">
                <property name="text">
-                <string>Parcourir</string>
+                <string>Browse</string>
                </property>
               </widget>
              </item>
@@ -337,7 +337,7 @@
            <item>
             <widget class="QPushButton" name="save_button_exec">
              <property name="text">
-              <string>Commencer l'enregistrement</string>
+              <string>Start recording</string>
              </property>
             </widget>
            </item>
@@ -420,7 +420,7 @@
        <item>
         <widget class="QLabel" name="select_trace_label">
          <property name="text">
-          <string>Sélectionner une trace </string>
+          <string>Select a trace file</string>
          </property>
         </widget>
        </item>
@@ -432,7 +432,7 @@
          <item>
           <widget class="QPushButton" name="browse_button">
            <property name="text">
-            <string>Parcourir</string>
+            <string>Browse</string>
            </property>
           </widget>
          </item>
@@ -446,7 +446,7 @@
         <x>0</x>
         <y>100</y>
         <width>291</width>
-        <height>122</height>
+        <height>131</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="execution_layout">
@@ -467,7 +467,7 @@
          <item>
           <widget class="QPushButton" name="execution_button">
            <property name="text">
-            <string>Exécuter la trace</string>
+            <string>Read trace</string>
            </property>
           </widget>
          </item>
@@ -485,7 +485,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="rotation_freq_label">
            <property name="text">
-            <string>Nombre de tours moteur affichés par seconde</string>
+            <string>Engine rotations displayed per second</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -539,7 +539,7 @@
          <item>
           <widget class="QLabel" name="ignition4_title_label">
            <property name="text">
-            <string>Bougie 4</string>
+            <string>Ignition 4</string>
            </property>
           </widget>
          </item>
@@ -560,7 +560,7 @@
          <item>
           <widget class="QLabel" name="ignition3_title_label">
            <property name="text">
-            <string>Bougie 3</string>
+            <string>Ignition 3</string>
            </property>
           </widget>
          </item>
@@ -581,7 +581,7 @@
          <item>
           <widget class="QLabel" name="ignition6_title_label">
            <property name="text">
-            <string>Bougie 6</string>
+            <string>Ignition 6</string>
            </property>
           </widget>
          </item>
@@ -602,7 +602,7 @@
          <item>
           <widget class="QLabel" name="ignition2_title_label">
            <property name="text">
-            <string>Bougie 2</string>
+            <string>Ignition 2</string>
            </property>
           </widget>
          </item>
@@ -623,7 +623,7 @@
          <item>
           <widget class="QLabel" name="ignition5_title_label">
            <property name="text">
-            <string>Bougie 5</string>
+            <string>Ignition 5</string>
            </property>
           </widget>
          </item>
@@ -644,7 +644,7 @@
          <item>
           <widget class="QLabel" name="ignition1_title_label">
            <property name="text">
-            <string>Bougie 1</string>
+            <string>Ignition 1</string>
            </property>
           </widget>
          </item>
@@ -665,7 +665,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>rpm moteur</string>
+            <string>Engine RPM</string>
            </property>
           </widget>
          </item>
