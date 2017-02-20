@@ -69,15 +69,18 @@ private slots:
 
     void nextState();
 
+    void updateRPMChart();
+
 
 private:
 
     bool readyToRead = false;    
-    QFile *traceFile;
-    QSerialPort *device;
-    QTextStream *traceFileIn;
+    QFile* traceFile;
+    QSerialPort* device;
+    QTextStream* traceFileIn;
 
-    QTimer *runTimer;
+    QTimer* runTimer;
+    QTimer* rpmTimer;
 
     float stepDelay;
     int execution_counter;
@@ -88,9 +91,13 @@ private:
     QLabel* ignitionLabels[NUM_CYLINDERS];
 
     QLineSeries* ignitionData[NUM_CYLINDERS];
+    QLineSeries* rpmData;
 
     QChart* ignitionChart_trace;
     QChart* ignitionChart_exec;
+
+    QChart* rpmChart_trace;
+    QChart* rpmChart_exec;
 
     QChartView* ignitionChartView;
     QChartView* engineChartView;
@@ -98,8 +105,6 @@ private:
 //    QGraphicsPixmapItem* cycle[NUM_CYLINDERS][NUM_ENGINE_ANIMATION_IMAGES];
     QGraphicsPixmapItem* cycle[NUM_ENGINE_ANIMATION_IMAGES];
     QGraphicsScene* engineCycleScene;
-    QBasicTimer* engineDisplayTimers[NUM_CYLINDERS];
-    int engineDisplayAvailableToDraw[NUM_CYLINDERS];
 
     int ignitionDelays[NUM_CYLINDERS];
     int engineDisplay_ignitionIndex;
@@ -119,6 +124,7 @@ private:
     void openDevice();
     void changeTimerCalls(int index);
     void setupIgnitionChart(QChart* chart);
+    void setupRPMChart(QChart* chart);
     void changeIgnition(QStringList values);
     void setupEngineCycleDisplay();
 };

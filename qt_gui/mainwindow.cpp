@@ -13,6 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     runTimer = new QTimer(this);
 
+    rpmTimer = new QTimer(this);
+
+    connect(runTimer, SIGNAL(timeout()), this, SLOT(updateRPMChart()));
+
+    rpmTimer->start(1000);
+
     stepDelay = 0.5;
     execution_counter = 0;
 
@@ -21,18 +27,23 @@ MainWindow::MainWindow(QWidget *parent) :
         ignitionData[i] = new QLineSeries();
     }
 
+    rpmData = new QLineSeries();
+
     ui->setupUi(this);
 
 	int curr_index = ui->tabWidget->currentIndex();
 
     engineDisplayTimer = new QTimer();
+    engineDisplayTimer->setTimerType(Qt::TimerType::PreciseTimer);
+
     connect(engineDisplayTimer, SIGNAL(timeout()), this, SLOT(nextState()));
 
     initDisplays(curr_index);
     changeTimerCalls(curr_index);
     setupEngineCycleDisplay();
 
-    setupIgnitionChart(ignitionChart_exec);
+    //setupIgnitionChart(ignitionChart_exec);
+    //setupRPMChart(rpm);
 }
 
 MainWindow::~MainWindow()
@@ -42,8 +53,10 @@ MainWindow::~MainWindow()
     delete device;
 
     delete runTimer;
-
+    delete rpmTimer;
     delete engineDisplayTimer;
+
+    delete rpmData;
 
     for(int i = 0; i < NUM_CYLINDERS; i++)
     {
@@ -64,6 +77,10 @@ MainWindow::~MainWindow()
 
     delete ignitionChart_exec;
     delete ignitionChart_trace;
+
+    delete rpmChart_exec;
+    delete rpmChart_trace;
+
     delete engineCycleScene;
 }
 
@@ -87,6 +104,7 @@ void MainWindow::initDisplays(int index)
         engineChartView     = (QChartView*)ui->engine_chart_exec;
 
         setupIgnitionChart(ignitionChart_exec);
+        setupRPMChart(rpmChart_exec);
     }
     else if (index == TRACE_MODE_INDEX)
     {
@@ -104,6 +122,7 @@ void MainWindow::initDisplays(int index)
         engineChartView     = (QChartView*)ui->engine_chart_trace;
 
         setupIgnitionChart(ignitionChart_trace);
+        setupRPMChart(rpmChart_trace);
     }
 }
 
@@ -429,6 +448,36 @@ void MainWindow::setupIgnitionChart(QChart* chart)
     ignitionChartView->setChart(chart);
 }
 
+void MainWindow::setupRPMChart(QChart *chart)
+{
+    //make a new chart that we're going to add to the view
+    chart = new QChart();
+
+    rpmData->clear();
+    rpmData->append(0, 0);
+
+    QValueAxis* axisX = new QValueAxis();
+    QValueAxis* axisY = new QValueAxis();
+
+    chart->addSeries(rpmData);
+
+    chart->createDefaultAxes();
+
+    axisX->setRange(0, 200);
+    axisY->setRange(0, 10000);
+
+
+    chart->setAxisX(axisX);
+    chart->setAxisY(axisY);
+
+    rpmData->attachAxis(axisX);
+    rpmData->attachAxis(axisY);
+
+    chart->legend()->hide();
+
+    engineChartView->setChart(chart);
+}
+
 void MainWindow::changeIgnition(QStringList values)
 {
     float ignitionValues[NUM_CYLINDERS];
@@ -537,5 +586,24 @@ void MainWindow::nextState()
 
     engineDisplayTimer->setInterval(timerDelay);
 
+}
+
+void MainWindow::updateRPMChart()
+{
+    static int index = 0;
+    if(runTimer->isActive())
+    {
+        rpmData->append(index++, ((int)(60/(currentRotationDuration/2000000))));
+
+        if(((QValueAxis*)engineChartView->chart()->axisX())->max() < index + 100)
+        {
+            ((QValueAxis*)engineChartView->chart()->axisX())->setMax(index + 200);
+        }
+
+        if(((QValueAxis*)engineChartView->chart()->axisY())->max() < ((int)(60/(currentRotationDuration/2000000))))
+        {
+            ((QValueAxis*)engineChartView->chart()->axisY())->setMax(((int)(60/(currentRotationDuration/2000000))) + 1000);
+        }
+    }
 }
 
